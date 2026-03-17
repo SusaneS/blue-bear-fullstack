@@ -4,6 +4,7 @@ export interface Course {
   id: number;
   code: string;
   name: string;
+  //TODO: check if description is needed
   credits: number;
   hoursPerWeek: number;
   prerequisiteId?: number;

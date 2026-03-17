@@ -1,24 +1,15 @@
-import React from 'react';
-import logo from './logo.svg';
+import CourseTable from './components/CoursesTable';
+import { Course } from './types/types';
 import './App.css';
 
 function App() {
+  const handleEnroll = (course: Course) => {
+    console.log('Enrolled in course:', course);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <CourseTable onEnroll={handleEnroll} />
     </div>
   );
 }
