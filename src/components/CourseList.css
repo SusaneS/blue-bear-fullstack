@@ -1,0 +1,145 @@
+.course-list-container {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: #1a1a2e;
+}
+
+.course-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.course-list-header h2 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1a1a2e;
+}
+
+.enroll-button {
+  background-color: #4f46e5;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.enroll-button:hover {
+  background-color: #4338ca;
+}
+
+.enroll-button:focus-visible {
+  outline: 3px solid #818cf8;
+  outline-offset: 2px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+.course-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+.course-table thead tr {
+  background-color: #4f46e5;
+  color: #fff;
+}
+
+.course-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.course-table th:first-child {
+  width: 2.5rem;
+  text-align: center;
+}
+
+.course-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: top;
+}
+
+.course-table td:first-child {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.course-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.1s;
+}
+
+.course-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.course-table tbody tr:hover {
+  background-color: #f5f3ff;
+}
+
+.course-table tbody tr.selected {
+  background-color: #ede9fe;
+}
+
+.course-table tbody tr.selected:hover {
+  background-color: #ddd6fe;
+}
+
+.course-name {
+  font-weight: 600;
+  white-space: nowrap;
+  color: #1a1a2e;
+}
+
+.course-description {
+  color: #4b5563;
+  max-width: 340px;
+  min-width: 180px;
+}
+
+.course-credits {
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.course-prerequisite {
+  white-space: nowrap;
+  color: #4b5563;
+}
+
+.course-grade-level {
+  white-space: nowrap;
+}
+
+.no-courses {
+  text-align: center;
+  color: #6b7280;
+  padding: 2rem;
+  font-size: 1rem;
+}
+
+input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #4f46e5;
+  cursor: pointer;
+}

@@ -1,0 +1,38 @@
+.app {
+  min-height: 100vh;
+  background-color: #f9fafb;
+}
+
+.app-header {
+  background-color: #4f46e5;
+  color: #fff;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.enrollment-confirmation {
+  max-width: 1100px;
+  margin: 1.5rem auto;
+  padding: 1rem 1.5rem;
+  background-color: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  border-radius: 8px;
+  color: #065f46;
+}
+
+.enrollment-confirmation h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.enrollment-confirmation p {
+  margin: 0;
+  font-size: 0.95rem;
+}
