@@ -145,3 +145,14 @@
   font-size: 0.875rem;
   margin-bottom: 0.25rem;
 }
+
+.loading-message,
+.error-message {
+  padding: 2rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  color: #dc3545;
+}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Course } from '../types/types';
-import { mockCourses } from './../data/mockCourses';
 import './CoursesTable.css';
+import { useCourses } from '../hooks/useCourses';
 
 interface CourseTableProps {
   onEnroll?: (course: Course) => void;
@@ -14,11 +14,12 @@ function getPrerequisiteName(prerequisiteId: number | undefined, courses: Course
 }
 
 const CourseTable: React.FC<CourseTableProps> = ({ onEnroll }) => {
+  const { courses, loading, error } = useCourses();
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
   //TODO: replace with actual enrollments
   const [enrolledIds, setEnrolledIds] = useState<Set<number>>(new Set());
 
-  const selectedCourse = mockCourses.find((c: Course) => c.id === selectedCourseId) ?? null;
+  const selectedCourse = courses.find((c: Course) => c.id === selectedCourseId) ?? null;
 
   const handleRowClick = (course: Course) => {
     setSelectedCourseId(course.id);
@@ -30,6 +31,24 @@ const CourseTable: React.FC<CourseTableProps> = ({ onEnroll }) => {
     onEnroll?.(selectedCourse);
     setSelectedCourseId(null);
   };
+
+  //TODO: check if pagination for the table is needed 
+  //but less priority - make it functional first
+  if (loading) {
+    return (
+      <div className="course-table-wrapper">
+        <div className="loading-message">Loading courses...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="course-table-wrapper">
+        <div className="error-message">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="course-table-wrapper">
@@ -66,7 +85,7 @@ const CourseTable: React.FC<CourseTableProps> = ({ onEnroll }) => {
             </tr>
           </thead>
           <tbody>
-            {mockCourses.map((course) => {
+            {courses.map((course) => {
               const isSelected = course.id === selectedCourseId;
               const isEnrolled = enrolledIds.has(course.id);
               return (
@@ -89,7 +108,7 @@ const CourseTable: React.FC<CourseTableProps> = ({ onEnroll }) => {
                   <td>{course.code}</td>
                   <td>{course.name}</td>
                   <td className="course-credits">{course.credits}</td>
-                  <td>{getPrerequisiteName(course.prerequisiteId, mockCourses)}</td>
+                  <td>{getPrerequisiteName(course.prerequisiteId, courses)}</td>
                   <td className="course-grade-level">
                     {course.gradeLevel.min} – {course.gradeLevel.max}
                   </td>
@@ -105,7 +124,7 @@ const CourseTable: React.FC<CourseTableProps> = ({ onEnroll }) => {
         <div className="enrolled-list">
           <h3 className="enrolled-list-title">Enrolled Courses</h3>
           <ul>
-            {mockCourses
+            {courses
               .filter((c) => enrolledIds.has(c.id))
               .map((c) => (
                 <li key={c.id}>
