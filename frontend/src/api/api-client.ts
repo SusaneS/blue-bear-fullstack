@@ -1,5 +1,6 @@
 // Example API client using axios
 import axios from 'axios';
+import { Course } from '../types/types';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 

@@ -1,22 +1,27 @@
 package com.maplewood.mapper;
 
-import com.maplewood.dto.CourseDto;
-import com.maplewood.model.CourseEntity;
+import com.maplewood.dto.CourseDTO;
+import com.maplewood.model.Course;
+import org.springframework.stereotype.Component;
 
-public final class CourseMapper {
-  private CourseMapper() {}
+@Component
+public class CourseMapper {
 
-  public static CourseDto toDto(CourseEntity entity) {
-    if (entity == null) return null;
+    public CourseDTO toDTO(Course course) {
+        if (course == null) {
+            return null;
+        }
 
-    return new CourseDto(
-        entity.getId(),
-        entity.getCode(),
-        entity.getName(),
-        entity.getCredits().doubleValue(),
-        entity.getHoursPerWeek(),
-        entity.getPrerequisiteId(),
-        new CourseDto.GradeLevelDto(entity.getGradeLevelMin(), entity.getGradeLevelMax())
-    );
-  }
+        return new CourseDTO(
+                course.getId(),
+                course.getCode(),
+                course.getName(),
+                course.getDescription(),
+                course.getCredits().doubleValue(),
+                course.getHoursPerWeek(),
+                course.getCourseType(),
+                course.getPrerequisiteId(),
+                new CourseDTO.GradeLevelDto(course.getGradeLevelMin(), course.getGradeLevelMax())
+        );
+    }
 }

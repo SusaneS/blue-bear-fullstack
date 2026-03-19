@@ -1,0 +1,61 @@
+import React, { useState } from 'react';
+import CourseBrowser from './CourseBrowser';
+import './TabLayout.css';
+
+enum Tab {
+  PROFILE = 'profile',
+  COURSES = 'courses',
+  SCHEDULE = 'schedule',
+}
+
+const TAB_CONFIG = [
+  { key: Tab.PROFILE, label: '📊 Student Profile' },
+  { key: Tab.COURSES, label: '📚 Course Browser' },
+  { key: Tab.SCHEDULE, label: '📅 Schedule Builder' },
+];
+
+const TabLayout: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<Tab>(Tab.COURSES);
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case Tab.PROFILE:
+        return (
+          <div className="placeholder card">
+            <h2>📊 Student Profile</h2>
+            <p>GPA, credits earned, graduation progress, and course history will go here.</p>
+          </div>
+        );
+      case Tab.COURSES:
+        return <CourseBrowser />;
+      case Tab.SCHEDULE:
+        return (
+          <div className="placeholder card">
+            <h2>📅 Schedule Builder</h2>
+            <p>Section selection, weekly grid, and enrollment actions will go here.</p>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="tab-layout">
+      <nav className="tab-nav">
+        {TAB_CONFIG.map((tab) => (
+          <button
+            key={tab.key}
+            className={`tab-btn ${activeTab === tab.key ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+      <div className="tab-content">
+        {renderContent()}
+      </div>
+    </div>
+  );
+};
+
+export default TabLayout;

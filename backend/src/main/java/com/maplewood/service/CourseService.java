@@ -1,32 +1,29 @@
 package com.maplewood.service;
 
-import com.maplewood.dto.CourseDto;
+import com.maplewood.dto.CourseDTO;
 import com.maplewood.mapper.CourseMapper;
 import com.maplewood.repository.CourseRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class CourseService {
-  @Autowired
-  private CourseRepository courseRepository;
 
-  public CourseService(CourseRepository courseRepository) {
-    this.courseRepository = courseRepository;
-  }
+    private final CourseRepository courseRepository;
+    private final CourseMapper courseMapper;
 
-  public List<CourseDto> getAllCourses() {
-    return courseRepository.findAll().stream()
-        .map(CourseMapper::toDto)
-        .toList();
-  }
+    public CourseService(CourseRepository courseRepository, CourseMapper courseMapper) {
+        this.courseRepository = courseRepository;
+        this.courseMapper = courseMapper;
+    }
 
-  public CourseDto getCourseById(Long id) {
-    return courseRepository.findById(id)
-    .map(CourseMapper::toDto)
-    .orElse(null);
-  }
+    public List<CourseDTO> getAllCourses() {
+        return courseRepository.findAll().stream()
+                .map(courseMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 }

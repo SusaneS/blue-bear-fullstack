@@ -1,7 +1,8 @@
 package com.maplewood.repository;
 
-import com.maplewood.model.CourseEntity;
-
+import com.maplewood.model.Course;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface CourseRepository extends JpaRepository<CourseEntity, Long> {}
+@Repository
+public interface CourseRepository extends JpaRepository<Course, Long> {}

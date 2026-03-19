@@ -1,17 +1,34 @@
-// Example TypeScript types for the application
-
 export interface Course {
   id: number;
   code: string;
   name: string;
-  //TODO: check if description is needed
+  description?: string;
   credits: number;
   hoursPerWeek: number;
+  courseType: 'core' | 'elective';
   prerequisiteId?: number;
   gradeLevel: {
     min: number;
     max: number;
   };
+}
+
+export interface CourseSection {
+  id: number;
+  courseId: number;
+  courseCode: string;
+  courseName: string;
+  courseType: 'core' | 'elective';
+  credits: number;
+  sectionLetter: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  teacherName: string;
+  classroomName: string;
+  maxCapacity: number;
+  currentEnrollment: number;
+  isFull: boolean;
 }
 
 export interface Student {
@@ -39,12 +56,12 @@ export interface CourseHistory {
 export interface Enrollment {
   id: number;
   studentId: number;
-  courseId: number;
+  courseSectionId: number;  // changed: section, not course
   semesterId: number;
   status: 'enrolled' | 'completed' | 'dropped';
 }
 
 export interface ValidationError {
-  type: 'prerequisite' | 'conflict' | 'max_courses' | 'other';
+  type: 'prerequisite' | 'conflict' | 'max_courses' | 'capacity' | 'other';
   message: string;
 }

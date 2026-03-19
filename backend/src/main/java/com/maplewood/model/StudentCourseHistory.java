@@ -17,7 +17,7 @@ public class StudentCourseHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
-    private CourseEntity course;
+    private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "semester_id", nullable = false)
@@ -37,8 +37,8 @@ public class StudentCourseHistory {
     public Student getStudent() { return student; }
     public void setStudent(Student student) { this.student = student; }
 
-    public CourseEntity getCourse() { return course; }
-    public void setCourse(CourseEntity course) { this.course = course; }
+    public Course getCourse() { return course; }
+    public void setCourse(Course course) { this.course = course; }
 
     public Semester getSemester() { return semester; }
     public void setSemester(Semester semester) { this.semester = semester; }

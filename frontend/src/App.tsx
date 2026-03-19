@@ -1,17 +1,22 @@
-import CourseTable from './components/CoursesTable';
-import { Course } from './types/types';
+import React from 'react';
+import { Provider } from 'react-redux';
+import TabLayout from './components/TabLayout';
 import './App.css';
+import { store } from './store/store';
 
-function App() {
-  const handleEnroll = (course: Course) => {
-    console.log('Enrolled in course:', course);
-  };
-
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <CourseTable onEnroll={handleEnroll} />
-    </div>
+    <Provider store={store}>
+      <div className="app">
+        <header className="app-header">
+          <h1>🍁 Maplewood High School</h1>
+        </header>
+        <main>
+          <TabLayout />
+        </main>
+      </div>
+    </Provider>
   );
-}
+};
 
 export default App;

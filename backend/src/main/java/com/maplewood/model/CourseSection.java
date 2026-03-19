@@ -13,7 +13,7 @@ public class CourseSection {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
-    private CourseEntity course;
+    private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "semester_id", nullable = false)
@@ -54,8 +54,8 @@ public class CourseSection {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public CourseEntity getCourse() { return course; }
-    public void setCourse(CourseEntity course) { this.course = course; }
+    public Course getCourse() { return course; }
+    public void setCourse(Course course) { this.course = course; }
 
     public Semester getSemester() { return semester; }
     public void setSemester(Semester semester) { this.semester = semester; }
