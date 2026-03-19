@@ -10,36 +10,43 @@ import java.util.List;
 
 @Repository
 public interface CourseSectionRepository extends JpaRepository<CourseSection, Long> {
-    
-    /**
-     * Find sections for a course with all related entities
-     */
-    @Query("""
-        SELECT cs, c, s, t, cl
-        FROM CourseSection cs
-        JOIN CourseEntity c ON cs.courseId = c.id
-        JOIN Semester s ON cs.semesterId = s.id
-        JOIN Teacher t ON cs.teacherId = t.id
-        JOIN Classroom cl ON cs.classroomId = cl.id
-        WHERE cs.courseId = :courseId AND cs.semesterId = :semesterId
-        ORDER BY cs.sectionLetter
-    """)
-    List<Object[]> findByCourseIdAndSemesterIdWithDetails(
-        @Param("courseId") Long courseId,
-        @Param("semesterId") Long semesterId
-    );
-    
-    /**
-     * Find a single section with all details
-     */
-    @Query("""
-        SELECT cs, c, s, t, cl
-        FROM CourseSection cs
-        JOIN CourseEntity c ON cs.courseId = c.id
-        JOIN Semester s ON cs.semesterId = s.id
-        JOIN Teacher t ON cs.teacherId = t.id
-        JOIN Classroom cl ON cs.classroomId = cl.id
-        WHERE cs.id = :sectionId
-    """)
-    List<Object[]> findByIdWithDetails(@Param("sectionId") Long sectionId);
+
+    // All sections for a semester
+    @Query("SELECT cs FROM CourseSection cs " +
+           "JOIN FETCH cs.course " +
+           "JOIN FETCH cs.teacher " +
+           "JOIN FETCH cs.classroom " +
+           "WHERE cs.semester.id = :semesterId")
+    List<CourseSection> findBySemesterIdWithDetails(@Param("semesterId") Long semesterId);
+
+    // All sections for a specific course in a semester
+    @Query("SELECT cs FROM CourseSection cs " +
+           "JOIN FETCH cs.teacher " +
+           "JOIN FETCH cs.classroom " +
+           "WHERE cs.course.id = :courseId AND cs.semester.id = :semesterId")
+    List<CourseSection> findByCourseIdAndSemesterId(@Param("courseId") Long courseId,
+                                                    @Param("semesterId") Long semesterId);
+
+    // Sections available to a grade level in a semester
+    @Query("SELECT cs FROM CourseSection cs " +
+           "JOIN FETCH cs.course c " +
+           "JOIN FETCH cs.teacher " +
+           "JOIN FETCH cs.classroom " +
+           "WHERE cs.semester.id = :semesterId " +
+           "AND c.gradeLevelMin <= :gradeLevel " +
+           "AND c.gradeLevelMax >= :gradeLevel")
+    List<CourseSection> findAvailableForGrade(@Param("semesterId") Long semesterId,
+                                              @Param("gradeLevel") Integer gradeLevel);
+
+    // Sections that are not full
+    @Query("SELECT cs FROM CourseSection cs " +
+           "JOIN FETCH cs.course c " +
+           "JOIN FETCH cs.teacher " +
+           "JOIN FETCH cs.classroom " +
+           "WHERE cs.semester.id = :semesterId " +
+           "AND cs.currentEnrollment < cs.maxCapacity " +
+           "AND c.gradeLevelMin <= :gradeLevel " +
+           "AND c.gradeLevelMax >= :gradeLevel")
+    List<CourseSection> findOpenSectionsForGrade(@Param("semesterId") Long semesterId,
+                                                 @Param("gradeLevel") Integer gradeLevel);
 }

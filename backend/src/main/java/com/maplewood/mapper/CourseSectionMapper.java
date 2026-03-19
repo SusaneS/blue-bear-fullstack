@@ -1,53 +1,32 @@
 package com.maplewood.mapper;
 
-import com.maplewood.dto.CourseSectionDto;
-import com.maplewood.model.*;
+import com.maplewood.dto.CourseSectionDTO;
+import com.maplewood.model.CourseSection;
 import org.springframework.stereotype.Component;
 
 @Component
 public class CourseSectionMapper {
-    
-    /**
-     * Convert CourseSection entity to DTO
-     * Requires related entities (Course, Semester, Teacher, Classroom)
-     */
-    public CourseSectionDto toDTO(CourseSection section, 
-                                   CourseEntity course, 
-                                   Semester semester, 
-                                   Teacher teacher, 
-                                   Classroom classroom) {
-        
-        CourseSectionDto dto = new CourseSectionDto();
 
-        // Section fields
-        dto.setId(section.getId());
-        dto.setSectionLetter(section.getSectionLetter());
-        dto.setDayOfWeek(section.getDayOfWeek());
-        dto.setStartTime(section.getStartTime());
-        dto.setEndTime(section.getEndTime());
-        dto.setMaxCapacity(section.getMaxCapacity());
-        dto.setCurrentEnrollment(section.getCurrentEnrollment());
-        dto.setAvailableSeats(section.getMaxCapacity() - section.getCurrentEnrollment());
-        dto.setIsFull(section.getCurrentEnrollment() >= section.getMaxCapacity());
-        
-        // Course fields
-        dto.setCourseId(course.getId());
-        dto.setCourseCode(course.getCode());
-        dto.setCourseName(course.getName());
-        
-        // Semester fields
-        dto.setSemesterId(semester.getId());
-        dto.setSemesterName(semester.getName());
-        dto.setSemesterYear(semester.getYear());
-        
-        // Teacher fields
-        dto.setTeacherId(teacher.getId());
-        dto.setTeacherName(teacher.getFirstName() + " " + teacher.getLastName());
-        
-        // Classroom fields
-        dto.setClassroomId(classroom.getId());
-        dto.setClassroomName(classroom.getName());
-        
-        return dto;
+    public CourseSectionDTO toDTO(CourseSection section) {
+        if (section == null) {
+            return null;
+        }
+
+        return new CourseSectionDTO(
+                section.getId(),
+                section.getCourse().getId(),
+                section.getCourse().getCode(),
+                section.getCourse().getName(),
+                section.getCourse().getCourseType(),
+                section.getCourse().getCredits().doubleValue(),
+                section.getSectionLetter(),
+                section.getDayOfWeek(),
+                section.getStartTime(),
+                section.getEndTime(),
+                section.getTeacher().getFirstName() + " " + section.getTeacher().getLastName(),
+                section.getClassroom().getName(),
+                section.getMaxCapacity(),
+                section.getCurrentEnrollment()
+        );
     }
 }

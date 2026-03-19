@@ -1,13 +1,10 @@
 package com.maplewood.controller;
 
 import com.maplewood.dto.CourseDto;
-import com.maplewood.dto.CourseSectionDto;
-import com.maplewood.service.CourseSectionService;
 import com.maplewood.service.CourseService;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,10 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/courses")
 public class CoursesController {
-  @Autowired
-  private CourseService courseService;
-  @Autowired
-  private CourseSectionService courseSectionService;
+  private final CourseService courseService;
 
   public CoursesController(CourseService courseService) {
     this.courseService = courseService;
@@ -39,28 +33,5 @@ public class CoursesController {
       return ResponseEntity.notFound().build();
     }
     return ResponseEntity.ok(course);
-  }
-
-  @GetMapping("/{courseId}/sections")
-  public ResponseEntity<List<CourseSectionDto>> getCourseSections(
-          @PathVariable Long courseId) {
-      
-      List<CourseSectionDto> sections = courseSectionService
-          .getSectionsByCourseId(courseId);
-      
-      return ResponseEntity.ok(sections);
-  }
-  
-  @GetMapping("/sections/{sectionId}")
-  public ResponseEntity<CourseSectionDto> getSectionById(
-          @PathVariable Long sectionId) {
-      
-      CourseSectionDto section = courseSectionService.getSectionById(sectionId);
-      
-      if (section == null) {
-          return ResponseEntity.notFound().build();
-      }
-      
-      return ResponseEntity.ok(section);
   }
 }

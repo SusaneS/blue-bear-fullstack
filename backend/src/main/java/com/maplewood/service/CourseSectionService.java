@@ -1,66 +1,51 @@
 package com.maplewood.service;
 
-import com.maplewood.dto.CourseSectionDto;
+import com.maplewood.dto.CourseSectionDTO;
 import com.maplewood.mapper.CourseSectionMapper;
-import com.maplewood.model.*;
-import com.maplewood.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.maplewood.repository.CourseSectionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class CourseSectionService {
-    
-    @Autowired
-    private CourseSectionRepository courseSectionRepository;
-    
-    @Autowired
-    private SemesterRepository semesterRepository;
-    
-    @Autowired
-    private CourseSectionMapper mapper;
-    
-    /**
-     * Get sections for a specific course
-     * Automatically uses active semester (course only exists in one semester)
-     */
-    public List<CourseSectionDto> getSectionsByCourseId(Long courseId) {
-        Semester activeSemester = getActiveSemester();
 
-        return courseSectionRepository
-            .findByCourseIdAndSemesterIdWithDetails(courseId, activeSemester.getId()).stream()
-            .map(this::mapResultToDTO)
-            .toList();
-    }
-    
+    private final CourseSectionRepository sectionRepository;
+    private final CourseSectionMapper sectionMapper;
 
-    public CourseSectionDto getSectionById(Long sectionId) {
-        List<Object[]> results = courseSectionRepository
-            .findByIdWithDetails(sectionId);
-        
-        if (results.isEmpty()) {
-            return null;
-        }
-        
-        return mapResultToDTO(results.get(0));
-    }
-    
-
-    private Semester getActiveSemester() {
-        return semesterRepository.findByIsActiveTrue()
-            .orElseThrow(() -> new RuntimeException("No active semester found"));
+    public CourseSectionService(CourseSectionRepository sectionRepository, CourseSectionMapper sectionMapper) {
+        this.sectionRepository = sectionRepository;
+        this.sectionMapper = sectionMapper;
     }
 
-    private CourseSectionDto mapResultToDTO(Object[] result) {
-        CourseSection section = (CourseSection) result[0];
-        CourseEntity course = (CourseEntity) result[1];
-        Semester semester = (Semester) result[2];
-        Teacher teacher = (Teacher) result[3];
-        Classroom classroom = (Classroom) result[4];
-        
-        return mapper.toDTO(section, course, semester, teacher, classroom);
+    // All sections for a semester
+    public List<CourseSectionDTO> getSectionsBySemester(Long semesterId) {
+        return sectionRepository.findBySemesterIdWithDetails(semesterId).stream()
+                .map(sectionMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Sections for a specific course
+    public List<CourseSectionDTO> getSectionsForCourse(Long courseId, Long semesterId) {
+        return sectionRepository.findByCourseIdAndSemesterId(courseId, semesterId).stream()
+                .map(sectionMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Open sections available for a student's grade
+    public List<CourseSectionDTO> getOpenSectionsForGrade(Long semesterId, Integer gradeLevel) {
+        return sectionRepository.findOpenSectionsForGrade(semesterId, gradeLevel).stream()
+                .map(sectionMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // All sections available for a grade (including full)
+    public List<CourseSectionDTO> getSectionsForGrade(Long semesterId, Integer gradeLevel) {
+        return sectionRepository.findAvailableForGrade(semesterId, gradeLevel).stream()
+                .map(sectionMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
