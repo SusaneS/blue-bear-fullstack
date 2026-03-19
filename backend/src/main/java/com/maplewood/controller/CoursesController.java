@@ -26,20 +26,12 @@ public class CoursesController {
     this.courseService = courseService;
   }
 
-  /**
-   * Get all courses
-   * GET /api/courses
-   */
   @GetMapping
   public ResponseEntity<List<CourseDto>> getCourses() {
     List<CourseDto> courses = courseService.getAllCourses();
     return ResponseEntity.ok(courses);
   }
 
-  /**
-   * Get single course
-   * GET /api/courses/{courseId}
-   */
   @GetMapping("/{courseId}")
   public ResponseEntity<CourseDto> getCourseById(@PathVariable Long courseId) {
     CourseDto course = courseService.getCourseById(courseId);
@@ -49,10 +41,6 @@ public class CoursesController {
     return ResponseEntity.ok(course);
   }
 
-  /**
-   * Get sections for a specific course
-   * GET /api/courses/{courseId}/sections
-   */
   @GetMapping("/{courseId}/sections")
   public ResponseEntity<List<CourseSectionDto>> getCourseSections(
           @PathVariable Long courseId) {
@@ -63,10 +51,6 @@ public class CoursesController {
       return ResponseEntity.ok(sections);
   }
   
-  /**
-   * Get a specific section by ID
-   * GET /api/sections/{sectionId}
-   */
   @GetMapping("/sections/{sectionId}")
   public ResponseEntity<CourseSectionDto> getSectionById(
           @PathVariable Long sectionId) {
