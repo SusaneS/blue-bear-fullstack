@@ -1,6 +1,7 @@
 // Example API client using axios
 import axios from 'axios';
 import { Course } from '../types/types';
+import { get } from 'http';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api';
 
@@ -27,7 +28,9 @@ export const coursesApi = {
 };
 
 export const studentsApi = {
+  getAll: () => apiClient.get('/students'),
   getById: (id: number) => apiClient.get(`/students/${id}`),
+  getProfile: (id: number) => apiClient.get(`/students/${id}/profile`),
   getSchedule: (id: number) => apiClient.get(`/students/${id}/schedule`),
 };
 

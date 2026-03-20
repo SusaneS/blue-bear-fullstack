@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import CourseBrowser from './CourseBrowser';
+import StudentProfile from './StudentProfile';
 import './TabLayout.css';
 
 enum Tab {
@@ -15,17 +16,12 @@ const TAB_CONFIG = [
 ];
 
 const TabLayout: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<Tab>(Tab.COURSES);
+  const [activeTab, setActiveTab] = useState<Tab>(Tab.PROFILE);
 
   const renderContent = () => {
     switch (activeTab) {
       case Tab.PROFILE:
-        return (
-          <div className="placeholder card">
-            <h2>📊 Student Profile</h2>
-            <p>GPA, credits earned, graduation progress, and course history will go here.</p>
-          </div>
-        );
+        return <StudentProfile />;
       case Tab.COURSES:
         return <CourseBrowser />;
       case Tab.SCHEDULE:

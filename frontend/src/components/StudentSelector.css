@@ -1,0 +1,25 @@
+.student-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.student-selector label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: white;
+}
+
+.student-selector select {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  min-width: 280px;
+  cursor: pointer;
+}
+
+.student-selector select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
