@@ -4,6 +4,7 @@ import com.maplewood.model.Enrollment;
 import com.maplewood.model.Enrollment.Status;
 import com.maplewood.model.Student;
 import com.maplewood.model.StudentCourseHistory;
+import com.maplewood.exception.EnrollmentException;
 import com.maplewood.model.Course;
 import com.maplewood.model.CourseSection;
 import com.maplewood.repository.EnrollmentRepository;
@@ -15,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
+
+import javax.lang.model.type.ErrorType;
 
 @Service
 public class EnrollmentService {
@@ -40,40 +43,41 @@ public class EnrollmentService {
 
     @Transactional
     public Enrollment enroll(Long studentId, Long sectionId) {
+        //TODO: add more details to error messages if time allows (e.g. for time coflict errors, include the conflicting section)
         Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+                .orElseThrow(() -> new EnrollmentException(EnrollmentException.ErrorType.STUDENT_NOT_FOUND, "Student not found"));
 
         CourseSection section = courseSectionRepository.findById(sectionId)
-                .orElseThrow(() -> new RuntimeException("Section not found"));
+                .orElseThrow(() -> new EnrollmentException(EnrollmentException.ErrorType.SECTION_NOT_FOUND, "Section not found"));
 
         enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId)
                 .ifPresent(e -> {
-                    throw new RuntimeException("Already enrolled in this section");
+                    throw new EnrollmentException(EnrollmentException.ErrorType.ALREADY_ENROLLED, "Already enrolled in this section");
                 });
                 
 
         long enrolled = enrollmentRepository.countBySectionIdAndStatus(sectionId, Status.ENROLLED);
         if (enrolled >= section.getMaxCapacity()) {
-            throw new RuntimeException("Section is full");
+            throw new EnrollmentException(EnrollmentException.ErrorType.SECTION_FULL, "Section is full");
         }
 
         List<Enrollment> currentEnrollments = enrollmentRepository.findByStudentIdAndStatus(studentId, Status.ENROLLED);
         if (currentEnrollments.size() >= 5) {
-            throw new RuntimeException("Cannot enroll in more than 5 sections");
+            throw new EnrollmentException(EnrollmentException.ErrorType.MAX_ENROLLMENT_REACHED, "Cannot enroll in more than 5 sections");
         }
 
         List<StudentCourseHistory> history = historyRepository.findByStudentIdWithCourse(studentId);
         boolean prerequisitesMet = hasMetPrerequisites(section.getCourse(), history);
         if (!prerequisitesMet) {
-            throw new RuntimeException("Prerequisites not met");
+            throw new EnrollmentException(EnrollmentException.ErrorType.PREREQUISITES_NOT_MET, "Prerequisites not met");
         }
-        
+
         boolean hasConflict = hasSectionTimeConflict(student, section, currentEnrollments.stream()
                 .map(Enrollment::getSection)
                 .toList());
 
         if (hasConflict) {
-            throw new RuntimeException("Section time conflict");
+            throw new EnrollmentException(EnrollmentException.ErrorType.TIME_CONFLICT, "Section time conflict");
         }
 
         Enrollment enrollment = new Enrollment(student, section, Status.ENROLLED);
@@ -83,7 +87,7 @@ public class EnrollmentService {
     @Transactional
     public Enrollment drop(Long studentId, Long sectionId) {
         Enrollment enrollment = enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId)
-                .orElseThrow(() -> new RuntimeException("Enrollment not found"));
+                .orElseThrow(() -> new EnrollmentException(EnrollmentException.ErrorType.ENROLLMENT_NOT_FOUND, "Enrollment not found"));
 
         enrollment.setStatus(Status.DROPPED);
         return enrollmentRepository.save(enrollment);
@@ -92,7 +96,7 @@ public class EnrollmentService {
     @Transactional
     public Enrollment complete(Long studentId, Long sectionId) {
         Enrollment enrollment = enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId)
-                .orElseThrow(() -> new RuntimeException("Enrollment not found"));
+                .orElseThrow(() -> new EnrollmentException(EnrollmentException.ErrorType.ENROLLMENT_NOT_FOUND, "Enrollment not found"));
 
         enrollment.setStatus(Status.COMPLETED);
         return enrollmentRepository.save(enrollment);
