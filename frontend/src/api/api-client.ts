@@ -27,6 +27,16 @@ export const coursesApi = {
   getById: (id: number) => apiClient.get(`/courses/${id}`),
 };
 
+export const courseSectionsApi = {
+  getFiltered: (
+    semesterId: number,
+    courseId?: number,
+    gradeLevel?: number, openOnly?: boolean) => apiClient.get(
+      '/sections', 
+      { params: { semesterId, courseId, gradeLevel, openOnly } 
+    })
+};
+
 export const studentsApi = {
   getAll: () => apiClient.get('/students'),
   getById: (id: number) => apiClient.get(`/students/${id}`),
@@ -35,6 +45,10 @@ export const studentsApi = {
 };
 
 export const enrollmentsApi = {
-  enroll: (studentId: number, courseId: number) =>
-    apiClient.post('/enrollments', { studentId, courseId }),
+  enroll: (studentId: number, sectionId: number) =>
+    apiClient.post('/enrollments/enroll', { studentId, sectionId }),
+  drop: (studentId: number, sectionId: number) =>
+    apiClient.delete('/enrollments/drop', { data: { studentId, sectionId } }),
+  complete: (studentId: number, sectionId: number) => 
+    apiClient.post('/enrollments/complete', { studentId, sectionId }),
 };

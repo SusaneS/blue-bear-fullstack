@@ -18,7 +18,7 @@ cursor.execute("""
         status TEXT NOT NULL CHECK (status IN ('ENROLLED', 'DROPPED', 'COMPLETED')),
         enrollment_date TEXT NOT NULL DEFAULT (datetime('now')),
         FOREIGN KEY (student_id) REFERENCES students(id),
-        FOREIGN KEY (section_id) REFERENCES sections(id),
+        FOREIGN KEY (section_id) REFERENCES course_sections(id),
         UNIQUE (student_id, section_id)
     )
 """)
@@ -35,7 +35,7 @@ cursor.execute("""
                 WHERE section_id = NEW.section_id
                 AND status = 'ENROLLED'
             ) >= (
-                SELECT max_capacity FROM sections
+                SELECT max_capacity FROM course_sections
                 WHERE id = NEW.section_id
             )
             THEN RAISE(ABORT, 'Section is full')
