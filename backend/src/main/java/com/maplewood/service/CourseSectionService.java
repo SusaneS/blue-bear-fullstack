@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class CourseSectionService {
 
+    // TODO: Clean up this file and repository 
+    // some of these queries might no longer be necessary with the new filtering logic
     private final CourseSectionRepository sectionRepository;
     private final CourseSectionMapper sectionMapper;
 
@@ -28,16 +30,18 @@ public class CourseSectionService {
                 .collect(Collectors.toList());
     }
 
-    // Sections for a specific course
-    public List<CourseSectionDTO> getSectionsForCourse(Long courseId, Long semesterId) {
-        return sectionRepository.findByCourseIdAndSemesterId(courseId, semesterId).stream()
+    public List<CourseSectionDTO> getSectionsFiltered(Long semesterId, Long courseId, Integer gradeLevel, boolean openOnly) {
+        var sections = sectionRepository.findFiltered(semesterId, courseId, gradeLevel);
+
+        return sections.stream()
+                .filter(section -> !openOnly || !section.isFull())
                 .map(sectionMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // Open sections available for a student's grade
-    public List<CourseSectionDTO> getOpenSectionsForGrade(Long semesterId, Integer gradeLevel) {
-        return sectionRepository.findOpenSectionsForGrade(semesterId, gradeLevel).stream()
+    // Sections for a specific course
+    public List<CourseSectionDTO> getSectionsForCourse(Long courseId, Long semesterId) {
+        return sectionRepository.findByCourseIdAndSemesterId(courseId, semesterId).stream()
                 .map(sectionMapper::toDTO)
                 .collect(Collectors.toList());
     }
