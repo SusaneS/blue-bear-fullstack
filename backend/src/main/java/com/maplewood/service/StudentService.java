@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,7 +36,7 @@ public class StudentService {
     public List<StudentDTO> getAllStudents() {
         return studentRepository.findAll().stream()
                 .map(studentMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public StudentProfileDTO getStudentProfile(Long studentId) {
@@ -48,7 +47,7 @@ public class StudentService {
 
         List<CourseHistoryDTO> courseHistory = history.stream()
                 .map(courseHistoryMapper::toDTO)
-                .collect(Collectors.toList());
+                .toList();
 
         double creditsEarned = history.stream()
                 .filter(h -> "passed".equals(h.getStatus()))
