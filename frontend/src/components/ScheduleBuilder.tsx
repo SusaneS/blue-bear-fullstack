@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchCourseSections } from '../store/courseSectionsSlice';
-import { fetchEnrollments, enrollInSection, dropEnrollment } from '../store/enrollmentSlice';
+import { enrollInSection, dropEnrollment } from '../store/enrollmentSlice';
 import { CourseSection } from '../types/types';
 import './ScheduleBuilder.css';
 import { useAppSelector } from '../store/hooks';
+import { selectEnrolledSectionsState } from '../store/selectors/selectEnrolledSectionsState';
 
 //TODO: fix logic - not correct, need courses list
 const hasMetPrerequisites = (
@@ -60,6 +60,7 @@ const getSectionUnavailableReason = (
   return '';
 }
 
+// TODO: remove modal and just show validaiton errors
 function Modal({
   open, title, children, onConfirm, onCancel, confirmLoading, okText = 'OK',
 }: {
@@ -96,7 +97,7 @@ const ScheduleBuilder: React.FC = () => {
 
   const { profile, loading } = useAppSelector((state) => state.student);
   const { sections, loading: sectionsLoading } = useAppSelector((state) => state.courseSections);
-  const { enrollments, loading: enrollmentLoading } = useAppSelector((state) => state.enrollment);
+  const { enrolledSections, loading: enrollmentLoading, error: enrollmentError } = useAppSelector(selectEnrolledSectionsState);
 
   const [selectedSection, setSelectedSection] = useState<CourseSection | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -105,9 +106,6 @@ const ScheduleBuilder: React.FC = () => {
 
   const maxEnrollments = 5;
   const courseHistory = profile?.courseHistory ?? [];
-  const enrolledSections = sections.filter(cs =>
-    enrollments.some(e => e.status === 'enrolled' && e.courseSectionId === cs.id)
-  );
   const isScheduleFull = enrolledSections.length >= maxEnrollments;
 
   const handleEnrollClick = (section: CourseSection) => {
@@ -148,7 +146,6 @@ const ScheduleBuilder: React.FC = () => {
     setSuccessMsg(null);
   };
 
-  // Filter sections by search term
   const filteredSections = sections.filter(section => {
     if (!searchTerm.trim()) return true;
     const term = searchTerm.toLowerCase();
