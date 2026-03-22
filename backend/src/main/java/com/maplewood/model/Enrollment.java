@@ -2,9 +2,9 @@ package com.maplewood.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-import com.maplewood.converter.LocalDateConverter;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDateTimeConverter;
 
 @Entity
 @Table(name = "enrollments", uniqueConstraints = {
@@ -32,9 +32,9 @@ public class Enrollment {
     @Column(nullable = false)
     private Status status;
 
-    @Convert(converter = LocalDateConverter.class)
+    @Convert(converter = LocalDateTimeConverter.class)
     @Column(name = "enrollment_date", nullable = false)
-    private LocalDate enrollmentDate;
+    private LocalDateTime enrollmentDate;
 
     public Enrollment() {}
 
@@ -42,7 +42,7 @@ public class Enrollment {
         this.student = student;
         this.section = section;
         this.status = status;
-        this.enrollmentDate = LocalDate.now();
+        this.enrollmentDate = LocalDateTime.now();
     }
 
     public Long getId() { return id; }
@@ -57,6 +57,6 @@ public class Enrollment {
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
 
-    public LocalDate getEnrollmentDate() { return enrollmentDate; }
-    public void setEnrollmentDate(LocalDate enrollmentDate) { this.enrollmentDate = enrollmentDate; }
+    public LocalDateTime getEnrollmentDate() { return enrollmentDate; }
+    public void setEnrollmentDate(LocalDateTime enrollmentDate) { this.enrollmentDate = enrollmentDate; }
 }
