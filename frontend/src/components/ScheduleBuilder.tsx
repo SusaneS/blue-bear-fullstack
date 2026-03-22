@@ -91,9 +91,6 @@ function Modal({
   );
 }
 
-// Assumption that schedule builder only shows course sections for current semester
-const CURRENT_SEMESTER_ID = 10;
-
 const ScheduleBuilder: React.FC = () => {
   const dispatch = useDispatch();
 
@@ -107,20 +104,11 @@ const ScheduleBuilder: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const maxEnrollments = 5;
-  const gradeLevel = profile?.gradeLevel;
-  const studentId = profile?.id;
   const courseHistory = profile?.courseHistory ?? [];
   const enrolledSections = sections.filter(cs =>
     enrollments.some(e => e.status === 'enrolled' && e.courseSectionId === cs.id)
   );
   const isScheduleFull = enrolledSections.length >= maxEnrollments;
-
-  useEffect(() => {
-    if (profile && gradeLevel != null && studentId != null) {
-      dispatch(fetchCourseSections({ semesterId: CURRENT_SEMESTER_ID, gradeLevel, openOnly: false }) as any);
-      dispatch(fetchEnrollments(studentId) as any);
-    }
-  }, [dispatch, gradeLevel, studentId, profile]);
 
   const handleEnrollClick = (section: CourseSection) => {
     setSelectedSection(section);

@@ -2,6 +2,11 @@ import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { fetchStudents, fetchStudentProfile, clearProfile } from '../store/studentSlice';
 import './StudentSelector.css';
+import { fetchEnrollments } from '../store/enrollmentSlice';
+import { fetchCourseSections } from '../store/courseSectionsSlice';
+
+// Assumption that schedule builder only shows course sections for current semester
+const CURRENT_SEMESTER_ID = 10;
 
 const StudentSelector: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -11,10 +16,13 @@ const StudentSelector: React.FC = () => {
     dispatch(fetchStudents());
   }, [dispatch]);
 
+  // Populate state once student is selected from dropdown in header - fetch profile, enrollments, and course sections for the student's grade level
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const studentId = Number(e.target.value);
     if (studentId) {
       dispatch(fetchStudentProfile(studentId));
+      dispatch(fetchCourseSections({ semesterId: CURRENT_SEMESTER_ID, gradeLevel: profile?.gradeLevel, openOnly: false }) as any);
+      dispatch(fetchEnrollments(studentId));
     } else {
       dispatch(clearProfile());
     }
