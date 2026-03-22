@@ -43,7 +43,6 @@ const studentSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch all students
       .addCase(fetchStudents.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -56,7 +55,6 @@ const studentSlice = createSlice({
         state.loading = false;
         state.error = action.error.message || 'Failed to load students';
       })
-      // Fetch student profile
       .addCase(fetchStudentProfile.pending, (state) => {
         state.loading = true;
         state.error = null;

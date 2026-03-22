@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import CourseBrowser from './CourseBrowser';
 import StudentProfile from './StudentProfile';
 import './TabLayout.css';
+import ScheduleBuilder from './ScheduleBuilder';
 
 enum Tab {
   PROFILE = 'profile',
@@ -25,12 +26,7 @@ const TabLayout: React.FC = () => {
       case Tab.COURSES:
         return <CourseBrowser />;
       case Tab.SCHEDULE:
-        return (
-          <div className="placeholder card">
-            <h2>📅 Schedule Builder</h2>
-            <p>Section selection, weekly grid, and enrollment actions will go here.</p>
-          </div>
-        );
+        return <ScheduleBuilder />;
     }
   };
 

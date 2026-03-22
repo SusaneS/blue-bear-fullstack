@@ -1,0 +1,104 @@
+.schedule-builder-container {
+  display: flex;
+  gap: 32px;
+}
+.panel {
+  flex: 1;
+}
+.panel h3 {
+  margin-top: 0;
+}
+.banner {
+  background: #ffe58f;
+  color: #664d03;
+  padding: 10px 16px;
+  border: 1px solid #ffecb5;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+.sections-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.section-item {
+  border-bottom: 1px solid #eee;
+  padding: 12px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.section-info {
+  flex: 1;
+}
+.enroll-btn {
+  padding: 6px 14px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: none;
+  background: #2e7d32;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.enroll-btn:disabled {
+  background: #aaa;
+  color: #eee;
+  cursor: not-allowed;
+}
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+.tooltip .tooltip-text {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  background: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  left: 110%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+.tooltip:hover .tooltip-text {
+  display: block;
+}
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1100;
+}
+.modal {
+  background: #fff;
+  border-radius: 6px;
+  max-width: 340px;
+  margin: 90px auto;
+  padding: 24px;
+  z-index: 1200;
+  position: relative;
+  box-shadow: 0 3px 20px rgba(0,0,0,0.25);
+}
+.modal-title {
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+.modal-error {
+  color: #a8071a;
+  background: #fff1f0;
+  margin-top: 14px;
+  padding: 7px 10px;
+  border-radius: 4px;
+  font-size: 0.98em;
+}
