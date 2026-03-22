@@ -48,7 +48,7 @@ export const enrollmentsApi = {
   enroll: (studentId: number, sectionId: number) =>
     apiClient.post('/enrollments/enroll', { studentId, sectionId }),
   drop: (studentId: number, sectionId: number) =>
-    apiClient.delete('/enrollments/drop', { data: { studentId, sectionId } }),
+    apiClient.put('/enrollments/drop', { studentId, sectionId }),
   complete: (studentId: number, sectionId: number) => 
     apiClient.post('/enrollments/complete', { studentId, sectionId }),
 };

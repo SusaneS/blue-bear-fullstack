@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchCourseSections } from '../store/courseSectionsSlice';
-import { fetchEnrollments, enrollInSection } from '../store/enrollmentSlice';
+import { fetchEnrollments, enrollInSection, dropEnrollment } from '../store/enrollmentSlice';
 import { CourseSection } from '../types/types';
 import './ScheduleBuilder.css';
 import { useAppSelector } from '../store/hooks';
@@ -176,6 +176,34 @@ const ScheduleBuilder: React.FC = () => {
     );
   });
 
+  const handleDropSectionClick = async (section: CourseSection) => {
+     if (!profile || !profile.courseHistory) {
+      setValidationError("Student data not loaded. Please refresh.");
+      return;
+    }
+
+    try {
+      const action = await dispatch(
+      dropEnrollment({ studentId: profile?.id, courseSectionId: section.id }) as any
+    );
+      if (dropEnrollment.rejected.match(action)) {
+        if (typeof action.payload === 'string') {
+          setValidationError(action.payload);
+        } else {
+          setValidationError('Failed to drop enrollment.');
+        }
+      } else {
+        setSuccessMsg("Enrollment dropped successfully!");
+
+        dispatch(fetchEnrollments(profile.id) as any);
+        dispatch(fetchCourseSections({ semesterId: CURRENT_SEMESTER_ID, gradeLevel, openOnly: false }) as any);
+        setTimeout(() => setSelectedSection(null), 1100);
+      }
+    } catch {
+      setValidationError('Unexpected error dropping an enrollment.');
+    }
+  }
+
   return (
     <div className="schedule-builder-outer">
     <div className="browser-filters card schedule-search-bar">
@@ -281,7 +309,7 @@ const ScheduleBuilder: React.FC = () => {
               <div className="btn-action-footer">
                 <button
                   className="drop-btn"
-                  onClick={() => handleEnrollClick(section)}
+                  onClick={() => handleDropSectionClick(section)}
                 >
                   Drop
                 </button>

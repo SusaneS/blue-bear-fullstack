@@ -29,6 +29,7 @@ public class EnrollmentController {
 
     @PutMapping("/drop")
     public ResponseEntity<Enrollment> drop(@RequestBody EnrollmentRequest request) {
-        return ResponseEntity.ok(enrollmentService.drop(request.getStudentId(), request.getSectionId()));
+        enrollmentService.drop(request.getStudentId(), request.getSectionId());
+        return ResponseEntity.ok().build();
     }
 }

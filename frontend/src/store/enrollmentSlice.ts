@@ -36,10 +36,13 @@ export const enrollInSection = createAsyncThunk(
 
 export const dropEnrollment = createAsyncThunk(
   'enrollment/dropEnrollment',
-  async ({ studentId, courseSectionId }: { studentId: number, courseSectionId: number }, { rejectWithValue }) => {
+  async (
+    { studentId, courseSectionId }: { studentId: number, courseSectionId: number },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await enrollmentsApi.drop(studentId, courseSectionId);
-      return response.data as Enrollment;
+      await enrollmentsApi.drop(studentId, courseSectionId);
+      return { studentId, courseSectionId };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to drop enrollment');
     }
@@ -87,9 +90,9 @@ const enrollmentSlice = createSlice({
       })
       .addCase(dropEnrollment.fulfilled, (state, action) => {
         state.loading = false;
-        const idx = state.enrollments.findIndex(e => e.id === action.payload.id);
+        const idx = state.enrollments.findIndex(e => e.id === action.payload.courseSectionId);
         if (idx >= 0) {
-          state.enrollments[idx] = action.payload;
+          state.enrollments.splice(idx, 1);
         }
       })
       .addCase(dropEnrollment.rejected, (state, action) => {

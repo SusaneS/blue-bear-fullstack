@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDateTimeConverter;
+import com.maplewood.converter.LocalDateTimeConverter;
+import com.maplewood.converter.LocalTimeConverter;
 
 @Entity
 @Table(name = "enrollments", uniqueConstraints = {

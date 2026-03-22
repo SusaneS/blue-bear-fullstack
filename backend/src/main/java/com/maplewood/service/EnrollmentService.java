@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EnrollmentService {
@@ -59,10 +60,18 @@ public class EnrollmentService {
         CourseSection section = courseSectionRepository.findById(sectionId)
                 .orElseThrow(() -> new EnrollmentException(EnrollmentException.ErrorType.SECTION_NOT_FOUND, "Section not found"));
 
-        enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId)
-                .ifPresent(e -> {
-                    throw new EnrollmentException(EnrollmentException.ErrorType.ALREADY_ENROLLED, "Already enrolled in this section");
-                });
+        Optional<Enrollment> enrollment = enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId);
+
+        enrollment.filter(e -> e.getStatus() == Status.ENROLLED || e.getStatus() == Status.COMPLETED)
+            .ifPresent(e -> {
+                throw new EnrollmentException(EnrollmentException.ErrorType.ALREADY_ENROLLED, "Already enrolled in this section");
+        });
+
+        if (enrollment.isPresent() && enrollment.get().getStatus() == Status.DROPPED) {
+            enrollment.get().setStatus(Status.ENROLLED);
+            enrollmentRepository.save(enrollment.get());
+            return;
+        }
 
         long enrolled = enrollmentRepository.countBySectionIdAndStatus(sectionId, Status.ENROLLED);
         if (enrolled >= section.getMaxCapacity()) {
@@ -93,10 +102,12 @@ public class EnrollmentService {
         if (hasConflict) {
             throw new EnrollmentException(EnrollmentException.ErrorType.TIME_CONFLICT, "Section time conflict");
         }
+
+        enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId);
         
-        Enrollment enrollment = new Enrollment(student, section, Status.ENROLLED);
-        Long generatedId = enrollmentRepository.insertAndReturnId(enrollment);
-        enrollment.setId(generatedId);
+        Enrollment newEnrollment = new Enrollment(student, section, Status.ENROLLED);
+        Long generatedId = enrollmentRepository.insertAndReturnId(newEnrollment);
+        newEnrollment.setId(generatedId);
         section.setCurrentEnrollment(section.getCurrentEnrollment() + 1);
     try {
         courseSectionRepository.save(section);
