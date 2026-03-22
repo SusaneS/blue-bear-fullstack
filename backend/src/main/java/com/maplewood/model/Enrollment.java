@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 import com.maplewood.converter.LocalDateTimeConverter;
-import com.maplewood.converter.LocalTimeConverter;
 
 @Entity
 @Table(name = "enrollments", uniqueConstraints = {
