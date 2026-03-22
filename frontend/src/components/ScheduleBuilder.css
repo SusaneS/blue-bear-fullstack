@@ -1,9 +1,25 @@
+.schedule-builder-outer {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.schedule-search-bar {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 0;
+}
+
 .schedule-builder-container {
   display: flex;
   gap: 32px;
 }
+
 .panel {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 .panel h3 {
   margin-top: 0;
@@ -42,11 +58,24 @@
   cursor: pointer;
   transition: background 0.2s;
 }
+
 .enroll-btn:disabled {
   background: #aaa;
   color: #eee;
   cursor: not-allowed;
 }
+
+.drop-btn {
+  padding: 6px 14px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: none;
+  background: #e53935;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
 .tooltip {
   position: relative;
   display: inline-block;
@@ -101,4 +130,45 @@
   padding: 7px 10px;
   border-radius: 4px;
   font-size: 0.98em;
+}
+
+.course-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 180px; 
+  justify-content: flex-start;
+  padding-bottom: 12px;
+  box-sizing: border-box;
+}
+
+.btn-action-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.section-unavailable {
+  margin-top: 12px;
+  background: #fff8e1;
+  color: #b47d00;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.94em;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.card-validation-area {
+  min-height: 40px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.scrollable-sections {
+ flex: 1 1 auto;
+  min-height: 0; /* needed for flex column children in Chrome/Webkit */
+  overflow-y: auto;
+  padding-right: 6px;
+  /* No height or max-height needed! */
 }

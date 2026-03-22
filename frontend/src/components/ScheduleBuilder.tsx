@@ -104,6 +104,7 @@ const ScheduleBuilder: React.FC = () => {
   const [selectedSection, setSelectedSection] = useState<CourseSection | null>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const maxEnrollments = 5;
   const gradeLevel = profile?.gradeLevel;
@@ -114,6 +115,7 @@ const ScheduleBuilder: React.FC = () => {
   );
   const isScheduleFull = enrolledSections.length >= maxEnrollments;
   // const isScheduleFull = true;
+
   useEffect(() => {
     if (profile && gradeLevel != null && studentId != null) {
       dispatch(fetchCourseSections({ semesterId: CURRENT_SEMESTER_ID, gradeLevel, openOnly: false }) as any);
@@ -121,7 +123,6 @@ const ScheduleBuilder: React.FC = () => {
     }
   }, [dispatch, gradeLevel, studentId, profile]);
 
-  // Modal
   const handleEnrollClick = (section: CourseSection) => {
     setSelectedSection(section);
     setValidationError(null);
@@ -163,7 +164,33 @@ const ScheduleBuilder: React.FC = () => {
     setSuccessMsg(null);
   };
 
+  // Filter sections by search term
+  const filteredSections = sections.filter(section => {
+    if (!searchTerm.trim()) return true;
+    const term = searchTerm.toLowerCase();
+    return (
+      section.courseName.toLowerCase().includes(term) ||
+      section.sectionLetter.toLowerCase().includes(term) ||
+      section.teacherName.toLowerCase().includes(term) ||
+      section.classroomName.toLowerCase().includes(term)
+    );
+  });
+
   return (
+    <div className="schedule-builder-outer">
+    <div className="browser-filters card schedule-search-bar">
+      <input
+        type="text"
+        className="search-input"
+        placeholder="🔍 Search by section name, teacher, or room..."
+        value={searchTerm}
+        onChange={e => setSearchTerm(e.target.value)}
+        style={{ width: 240 }}
+      />
+      <span className="filter-summary" style={{ marginLeft: 12 }}>
+        Showing {filteredSections.length} of {sections.length} sections
+      </span>
+    </div>
     <div className="schedule-builder-container">
       {/* All Sections List */}
       <div className="panel">
@@ -173,12 +200,12 @@ const ScheduleBuilder: React.FC = () => {
             You have reached the maximum number of {maxEnrollments} active sections for this semester. Drop a section to enroll in another.
           </div>
         )}
-        <ul className="sections-list">
-          {sectionsLoading ? (
-            <li>Loading...</li>
-          ) : sections.length === 0 ? (
-            <li>No sections found.</li>
-          ) : sections.map(section => {
+        <div className="course-grid">
+        {sectionsLoading ? (
+            <div className="card empty">Loading...</div>
+          ) : filteredSections.length === 0 ? (
+            <div className="card empty">No sections found.</div>
+          ) : filteredSections.map(section => {
               const disabled = !isSectionAvailable(
                 section,
                 enrolledSections,
@@ -192,53 +219,78 @@ const ScheduleBuilder: React.FC = () => {
                 isScheduleFull
               );
               return (
-                <li
-                  className={`section-item${disabled ? ' section-item--disabled' : ''}`}
+                <div
+                  className={`course-card card${disabled ? ' section-item--disabled' : ''}`}
                   key={section.id}
+                  style={disabled ? { opacity: 0.67 } : {}}
                 >
-                  <div className="section-info">
-                    <strong>{section.courseName} {section.sectionLetter}</strong><br />
-                    {section.dayOfWeek}, {section.startTime}-{section.endTime}<br />
-                    Teacher: {section.teacherName} | Room: {section.classroomName}<br />
-                    ({section.currentEnrollment} / {section.maxCapacity} enrolled)
-                    {disabled && reason && (
-                      <div className="section-unavailable">⚠️ {reason}</div>
-                    )}
+                  <div className="course-card-header">
+                    <h3>{section.courseName} — {section.sectionLetter}</h3>
+                    <span className="badge-type core">{section.teacherName}</span>
                   </div>
-                  <button
-                    className="enroll-btn"
-                    onClick={() => handleEnrollClick(section)}
-                    disabled={disabled}
-                    aria-disabled={disabled}
-                    tabIndex={disabled ? -1 : 0}
-                  >
-                    Enroll
-                  </button>
-                </li>
+                  <div className="course-details">
+                    <span>📅 {section.dayOfWeek}</span>
+                    <span>🕒 {section.startTime}-{section.endTime}</span>
+                    <span>🏫 {section.classroomName}</span>
+                    <span>👥 {section.currentEnrollment} / {section.maxCapacity} enrolled</span>
+                  </div>
+                  <div className="card-validation-area">
+                    {disabled && reason ? (
+                      <div className="section-unavailable">⚠️ {reason}</div>
+                    ) : null}
+                  </div>
+                  <div className="btn-action-footer">
+                    <button
+                      className="enroll-btn"
+                      onClick={() => handleEnrollClick(section)}
+                      disabled={disabled}
+                      aria-disabled={disabled}
+                      tabIndex={disabled ? -1 : 0}
+                    >
+                      Enroll
+                    </button>
+                  </div>
+                </div>
               );
             })}
-        </ul>
+        </div>
       </div>
       {/* Enrolled Sections */}
       <div className="panel">
         <h3>Your Enrolled Sections</h3>
-        <ul className="sections-list">
+        <div className="course-grid">
           {enrollmentLoading ? (
-            <li>Loading...</li>
+            <div className="card empty">Loading...</div>
           ) : enrolledSections.length === 0 ? (
-            <li>No enrolled sections.</li>
+            <div className="card empty">No enrolled sections.</div>
           ) : enrolledSections.map(section => (
-            <li className="section-item" key={section.id}>
-              <div className="section-info">
-                <strong>{section.courseName} {section.sectionLetter}</strong><br />
-                {section.dayOfWeek}, {section.startTime}-{section.endTime}<br />
-                Teacher: {section.teacherName} | Room: {section.classroomName}<br />
-                ({section.currentEnrollment} / {section.maxCapacity} enrolled)
+            <div className="course-card card" key={section.id}>
+              <div className="course-card-header">
+                <h3>{section.courseName} — {section.sectionLetter}</h3>
+                <span className="badge-type core">
+                  {section.teacherName}
+                </span>
               </div>
-            </li>
+              <div className="course-details">
+                <span>📅 {section.dayOfWeek}</span>
+                <span>🕒 {section.startTime}-{section.endTime}</span>
+                <span>🏫 {section.classroomName}</span>
+                <span>👥 {section.currentEnrollment} / {section.maxCapacity} enrolled</span>
+              </div>
+              <div className="card-validation-area"></div>
+              <div className="btn-action-footer">
+                <button
+                  className="drop-btn"
+                  onClick={() => handleEnrollClick(section)}
+                >
+                  Drop
+                </button>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
+    </div>
       {/* Modal */}
       <Modal
         open={!!selectedSection}
