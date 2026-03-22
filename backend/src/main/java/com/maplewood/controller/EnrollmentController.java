@@ -2,6 +2,7 @@ package com.maplewood.controller;
 
 import com.maplewood.model.Enrollment;
 import com.maplewood.service.EnrollmentService;
+import com.maplewood.dto.EnrollmentDTO;
 import com.maplewood.dto.EnrollmentRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +18,9 @@ public class EnrollmentController {
     }
 
     @PostMapping("/enroll")
-    public ResponseEntity<Enrollment> enroll(@RequestBody EnrollmentRequest request) {
-        enrollmentService.enroll(request.getStudentId(), request.getSectionId());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<EnrollmentDTO> enroll(@RequestBody EnrollmentRequest request) {
+        EnrollmentDTO enrollment = enrollmentService.enroll(request.getStudentId(), request.getSectionId());
+        return ResponseEntity.ok(enrollment);
     }
 
     @PutMapping("/complete")

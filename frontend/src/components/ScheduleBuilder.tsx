@@ -114,7 +114,6 @@ const ScheduleBuilder: React.FC = () => {
     enrollments.some(e => e.status === 'enrolled' && e.courseSectionId === cs.id)
   );
   const isScheduleFull = enrolledSections.length >= maxEnrollments;
-  // const isScheduleFull = true;
 
   useEffect(() => {
     if (profile && gradeLevel != null && studentId != null) {
@@ -148,9 +147,6 @@ const ScheduleBuilder: React.FC = () => {
         }
       } else {
         setSuccessMsg("Enrollment successful!");
-
-        dispatch(fetchEnrollments(profile.id) as any);
-        dispatch(fetchCourseSections({ semesterId: CURRENT_SEMESTER_ID, gradeLevel, openOnly: false }) as any);
         setTimeout(() => setSelectedSection(null), 1100);
       }
     } catch {
@@ -195,8 +191,6 @@ const ScheduleBuilder: React.FC = () => {
       } else {
         setSuccessMsg("Enrollment dropped successfully!");
 
-        dispatch(fetchEnrollments(profile.id) as any);
-        dispatch(fetchCourseSections({ semesterId: CURRENT_SEMESTER_ID, gradeLevel, openOnly: false }) as any);
         setTimeout(() => setSelectedSection(null), 1100);
       }
     } catch {

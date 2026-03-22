@@ -53,7 +53,7 @@ public class EnrollmentService {
     }
 
     @Transactional
-    public void enroll(Long studentId, Long sectionId) {
+    public EnrollmentDTO enroll(Long studentId, Long sectionId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new EnrollmentException(EnrollmentException.ErrorType.STUDENT_NOT_FOUND, "Student not found"));
 
@@ -70,7 +70,7 @@ public class EnrollmentService {
         if (enrollment.isPresent() && enrollment.get().getStatus() == Status.DROPPED) {
             enrollment.get().setStatus(Status.ENROLLED);
             enrollmentRepository.save(enrollment.get());
-            return;
+            return EnrollmentMapper.toDTO(enrollment.get());
         }
 
         long enrolled = enrollmentRepository.countBySectionIdAndStatus(sectionId, Status.ENROLLED);
@@ -115,6 +115,7 @@ public class EnrollmentService {
             throw new EnrollmentException(EnrollmentException.ErrorType.SECTION_FULL,
                 "Section just filled up. Please refresh and try another section.");
         }
+        return EnrollmentMapper.toDTO(newEnrollment);
     }
 
     @Transactional

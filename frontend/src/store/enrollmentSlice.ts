@@ -90,7 +90,7 @@ const enrollmentSlice = createSlice({
       })
       .addCase(dropEnrollment.fulfilled, (state, action) => {
         state.loading = false;
-        const idx = state.enrollments.findIndex(e => e.id === action.payload.courseSectionId);
+        const idx = state.enrollments.findIndex(e => e.courseSectionId === action.payload.courseSectionId);
         if (idx >= 0) {
           state.enrollments.splice(idx, 1);
         }
