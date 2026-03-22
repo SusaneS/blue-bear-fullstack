@@ -1,7 +1,10 @@
 package com.maplewood.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
+import java.time.LocalDate;
+
+import com.maplewood.converter.LocalDateConverter;
 
 @Entity
 @Table(name = "enrollments", uniqueConstraints = {
@@ -14,7 +17,6 @@ public class Enrollment {
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
@@ -29,8 +31,9 @@ public class Enrollment {
     @Column(nullable = false)
     private Status status;
 
+    @Convert(converter = LocalDateConverter.class)
     @Column(name = "enrollment_date", nullable = false)
-    private LocalDateTime enrollmentDate = LocalDateTime.now();
+    private LocalDate enrollmentDate;
 
     public Enrollment() {}
 
@@ -38,10 +41,8 @@ public class Enrollment {
         this.student = student;
         this.section = section;
         this.status = status;
-        this.enrollmentDate = LocalDateTime.now();
+        this.enrollmentDate = LocalDate.now();
     }
-
-    // Getters and Setters
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -55,6 +56,6 @@ public class Enrollment {
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
 
-    public LocalDateTime getEnrollmentDate() { return enrollmentDate; }
-    public void setEnrollmentDate(LocalDateTime enrollmentDate) { this.enrollmentDate = enrollmentDate; }
+    public LocalDate getEnrollmentDate() { return enrollmentDate; }
+    public void setEnrollmentDate(LocalDate enrollmentDate) { this.enrollmentDate = enrollmentDate; }
 }

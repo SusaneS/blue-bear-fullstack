@@ -5,7 +5,7 @@ import jakarta.persistence.Converter;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-@Converter(autoApply = true)
+// @Converter(autoApply = true)
 public class LocalDateConverter implements AttributeConverter<LocalDate, String> {
     
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");

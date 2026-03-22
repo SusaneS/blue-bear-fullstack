@@ -5,7 +5,7 @@ import jakarta.persistence.Converter;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-@Converter(autoApply = true)
+// @Converter(austoApply = true)
 public class LocalTimeConverter implements AttributeConverter<LocalTime, String> {
     
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");

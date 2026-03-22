@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
+public interface EnrollmentRepository extends JpaRepository<Enrollment, Long>, EnrollmentCustomRepository {
 
     List<Enrollment> findByStudentIdAndStatus(Long studentId, Status status);
 

@@ -1,8 +1,8 @@
 package com.maplewood.controller;
 
+import com.maplewood.dto.EnrollmentDTO;
 import com.maplewood.dto.StudentDTO;
 import com.maplewood.dto.StudentProfileDTO;
-import com.maplewood.model.Enrollment;
 import com.maplewood.service.EnrollmentService;
 import com.maplewood.service.StudentService;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +33,7 @@ public class StudentController {
     }
 
     @GetMapping("/{id}/schedule")
-    public ResponseEntity<List<Enrollment>> getSchedule(@PathVariable Long id) {
+    public ResponseEntity<List<EnrollmentDTO>> getSchedule(@PathVariable Long id) {
         return ResponseEntity.ok(enrollmentService.getEnrollmentsByStudent(id));
     }
 }

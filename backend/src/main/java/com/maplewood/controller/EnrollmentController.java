@@ -18,7 +18,8 @@ public class EnrollmentController {
 
     @PostMapping("/enroll")
     public ResponseEntity<Enrollment> enroll(@RequestBody EnrollmentRequest request) {
-        return ResponseEntity.ok(enrollmentService.enroll(request.getStudentId(), request.getSectionId()));
+        enrollmentService.enroll(request.getStudentId(), request.getSectionId());
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/complete")

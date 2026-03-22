@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 @Table(name = "course_sections")
 public class CourseSection {
 
+    @Version
+    private Integer version;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

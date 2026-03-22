@@ -4,20 +4,22 @@ import com.maplewood.model.Enrollment;
 import com.maplewood.model.Enrollment.Status;
 import com.maplewood.model.Student;
 import com.maplewood.model.StudentCourseHistory;
+import com.maplewood.dto.EnrollmentDTO;
 import com.maplewood.exception.EnrollmentException;
+import com.maplewood.mapper.EnrollmentMapper;
 import com.maplewood.model.Course;
 import com.maplewood.model.CourseSection;
 import com.maplewood.repository.EnrollmentRepository;
 import com.maplewood.repository.StudentCourseHistoryRepository;
 import com.maplewood.repository.StudentRepository;
 import com.maplewood.repository.CourseSectionRepository;
+
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
 import java.util.List;
-
-import javax.lang.model.type.ErrorType;
 
 @Service
 public class EnrollmentService {
@@ -37,12 +39,15 @@ public class EnrollmentService {
         this.historyRepository = historyRepository;
     }
 
-    public List<Enrollment> getEnrollmentsByStudent(Long studentId) {
-        return enrollmentRepository.findByStudentIdAndStatus(studentId, Status.ENROLLED);
+    public List<EnrollmentDTO> getEnrollmentsByStudent(Long studentId) {
+        return enrollmentRepository.findByStudentIdAndStatus(studentId, Status.ENROLLED)
+        .stream()
+        .map(EnrollmentMapper::toDTO)
+        .toList();
     }
 
     @Transactional
-    public Enrollment enroll(Long studentId, Long sectionId) {
+    public void enroll(Long studentId, Long sectionId) {
         //TODO: add more details to error messages if time allows (e.g. for time coflict errors, include the conflicting section)
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new EnrollmentException(EnrollmentException.ErrorType.STUDENT_NOT_FOUND, "Student not found"));
@@ -80,8 +85,17 @@ public class EnrollmentService {
             throw new EnrollmentException(EnrollmentException.ErrorType.TIME_CONFLICT, "Section time conflict");
         }
 
+        
         Enrollment enrollment = new Enrollment(student, section, Status.ENROLLED);
-        return enrollmentRepository.save(enrollment);
+        Long generatedId = enrollmentRepository.insertAndReturnId(enrollment);
+        enrollment.setId(generatedId);
+        section.setCurrentEnrollment(section.getCurrentEnrollment() + 1);
+    try {
+        courseSectionRepository.save(section);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            throw new EnrollmentException(EnrollmentException.ErrorType.SECTION_FULL,
+                "Section just filled up. Please refresh and try another section.");
+        }
     }
 
     @Transactional
@@ -100,13 +114,6 @@ public class EnrollmentService {
 
         enrollment.setStatus(Status.COMPLETED);
         return enrollmentRepository.save(enrollment);
-    }
-
-    @Transactional
-    public List<Enrollment> enrollBatch(Long studentId, List<Long> sectionIds) {
-        return sectionIds.stream()
-                .map(sectionId -> enroll(studentId, sectionId))
-                .toList();
     }
 
     private boolean hasSectionTimeConflict(Student student, CourseSection newSection, List<CourseSection> enrolledSections) {
