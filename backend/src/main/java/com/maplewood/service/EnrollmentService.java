@@ -12,6 +12,7 @@ import com.maplewood.model.CourseSection;
 import com.maplewood.repository.EnrollmentRepository;
 import com.maplewood.repository.StudentCourseHistoryRepository;
 import com.maplewood.repository.StudentRepository;
+import com.maplewood.repository.CourseRepository;
 import com.maplewood.repository.CourseSectionRepository;
 
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -27,15 +28,19 @@ public class EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final StudentRepository studentRepository;
     private final CourseSectionRepository courseSectionRepository;
+    private final CourseRepository courseRepository;
     private final StudentCourseHistoryRepository historyRepository;
+    private final int MAX_STUDENT_ENROLLMENTS = 5;
 
     public EnrollmentService(EnrollmentRepository enrollmentRepository,
                              StudentRepository studentRepository,
                              CourseSectionRepository courseSectionRepository,
+                             CourseRepository courseRepository,
                              StudentCourseHistoryRepository historyRepository) {
         this.enrollmentRepository = enrollmentRepository;
         this.studentRepository = studentRepository;
         this.courseSectionRepository = courseSectionRepository;
+        this.courseRepository = courseRepository;
         this.historyRepository = historyRepository;
     }
 
@@ -48,7 +53,6 @@ public class EnrollmentService {
 
     @Transactional
     public void enroll(Long studentId, Long sectionId) {
-        //TODO: add more details to error messages if time allows (e.g. for time coflict errors, include the conflicting section)
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new EnrollmentException(EnrollmentException.ErrorType.STUDENT_NOT_FOUND, "Student not found"));
 
@@ -59,7 +63,6 @@ public class EnrollmentService {
                 .ifPresent(e -> {
                     throw new EnrollmentException(EnrollmentException.ErrorType.ALREADY_ENROLLED, "Already enrolled in this section");
                 });
-                
 
         long enrolled = enrollmentRepository.countBySectionIdAndStatus(sectionId, Status.ENROLLED);
         if (enrolled >= section.getMaxCapacity()) {
@@ -67,14 +70,20 @@ public class EnrollmentService {
         }
 
         List<Enrollment> currentEnrollments = enrollmentRepository.findByStudentIdAndStatus(studentId, Status.ENROLLED);
-        if (currentEnrollments.size() >= 5) {
-            throw new EnrollmentException(EnrollmentException.ErrorType.MAX_ENROLLMENT_REACHED, "Cannot enroll in more than 5 sections");
+        if (currentEnrollments.size() >= MAX_STUDENT_ENROLLMENTS) {
+            throw new EnrollmentException(EnrollmentException.ErrorType.MAX_ENROLLMENT_REACHED, "Cannot enroll in more than " + MAX_STUDENT_ENROLLMENTS + " sections");
         }
 
         List<StudentCourseHistory> history = historyRepository.findByStudentIdWithCourse(studentId);
         boolean prerequisitesMet = hasMetPrerequisites(section.getCourse(), history);
         if (!prerequisitesMet) {
-            throw new EnrollmentException(EnrollmentException.ErrorType.PREREQUISITES_NOT_MET, "Prerequisites not met");
+            String prerequisiteCourseName = courseRepository.findById(section.getCourse().getPrerequisiteId())
+                    .map(cs -> cs.getName())
+                    .orElse("Unknown prerequisite");
+            throw new EnrollmentException(
+                EnrollmentException.ErrorType.PREREQUISITES_NOT_MET,
+                "Prerequisites not met: must complete course " + prerequisiteCourseName
+            );
         }
 
         boolean hasConflict = hasSectionTimeConflict(student, section, currentEnrollments.stream()
@@ -84,7 +93,6 @@ public class EnrollmentService {
         if (hasConflict) {
             throw new EnrollmentException(EnrollmentException.ErrorType.TIME_CONFLICT, "Section time conflict");
         }
-
         
         Enrollment enrollment = new Enrollment(student, section, Status.ENROLLED);
         Long generatedId = enrollmentRepository.insertAndReturnId(enrollment);

@@ -7,7 +7,6 @@ import java.util.Map;
 
 public class EnrollmentErrorTypeMapper {
 
-    // Static map of ErrorType to HttpStatus
     private static final Map<EnrollmentException.ErrorType, HttpStatus> STATUS_MAP = new EnumMap<>(EnrollmentException.ErrorType.class);
 
     static {

@@ -10,9 +10,8 @@ public class SemesterDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private Boolean isActive;
-    private String displayName; // "Fall 2024"
+    private String displayName;
     
-    // Constructors
     public SemesterDto() {}
     
     public SemesterDto(Long id, String name, Integer year, Integer orderInYear,
@@ -27,7 +26,6 @@ public class SemesterDto {
         this.displayName = name + " " + year;
     }
     
-    // Getters and Setters
     public Long getId() {
         return id;
     }

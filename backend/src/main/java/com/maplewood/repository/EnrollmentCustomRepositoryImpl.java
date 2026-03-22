@@ -23,7 +23,7 @@ public class EnrollmentCustomRepositoryImpl implements EnrollmentCustomRepositor
         String sql = "INSERT INTO enrollments (enrollment_date, section_id, status, student_id) " +
                      "VALUES (:enrollment_date, :section_id, :status, :student_id) RETURNING id";
         Query query = entityManager.createNativeQuery(sql);
-        query.setParameter("enrollment_date", enrollment.getEnrollmentDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        query.setParameter("enrollment_date", enrollment.getEnrollmentDate().format(DateTimeFormatter.ofPattern(("yyyy-MM-dd HH:mm:ss"))));
         query.setParameter("section_id", enrollment.getSection().getId());
         query.setParameter("status", enrollment.getStatus().name());
         query.setParameter("student_id", enrollment.getStudent().getId());

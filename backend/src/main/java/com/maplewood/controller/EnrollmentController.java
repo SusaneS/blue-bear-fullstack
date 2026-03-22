@@ -31,9 +31,4 @@ public class EnrollmentController {
     public ResponseEntity<Enrollment> drop(@RequestBody EnrollmentRequest request) {
         return ResponseEntity.ok(enrollmentService.drop(request.getStudentId(), request.getSectionId()));
     }
-
-    // @PostMapping("/enroll/batch")
-    // public ResponseEntity<List<Enrollment>> enrollBatch(@RequestBody EnrollmentBatchRequest request) {
-    //     return ResponseEntity.ok(enrollmentService.enrollBatch(request.getStudentId(), request.getSectionIds()));
-    // }
 }

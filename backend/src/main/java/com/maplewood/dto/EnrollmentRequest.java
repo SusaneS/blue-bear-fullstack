@@ -1,4 +1,3 @@
-// EnrollmentRequest.java
 package com.maplewood.dto;
 
 public class EnrollmentRequest {

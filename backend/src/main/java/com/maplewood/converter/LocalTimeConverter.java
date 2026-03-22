@@ -1,11 +1,9 @@
 package com.maplewood.converter;
 
 import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-// @Converter(austoApply = true)
 public class LocalTimeConverter implements AttributeConverter<LocalTime, String> {
     
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");

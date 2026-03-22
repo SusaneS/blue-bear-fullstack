@@ -6,7 +6,7 @@ public class CourseHistoryDTO {
     private Long courseId;
     private String courseName;
     private Long semesterId;
-    private String status; // "passed" or "failed"
+    private String status; // TODO: consider using an enum for status instead of String
 
     public CourseHistoryDTO() {}
 

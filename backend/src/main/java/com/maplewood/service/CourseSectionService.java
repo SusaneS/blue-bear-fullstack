@@ -30,15 +30,6 @@ public class CourseSectionService {
                 .collect(Collectors.toList());
     }
 
-    public List<CourseSectionDTO> getSectionsFiltered(Long semesterId, Long courseId, Integer gradeLevel, boolean openOnly) {
-        var sections = sectionRepository.findFiltered(semesterId, courseId, gradeLevel);
-
-        return sections.stream()
-                .filter(section -> !openOnly || !section.isFull())
-                .map(sectionMapper::toDTO)
-                .collect(Collectors.toList());
-    }
-
     // Sections for a specific course
     public List<CourseSectionDTO> getSectionsForCourse(Long courseId, Long semesterId) {
         return sectionRepository.findByCourseIdAndSemesterId(courseId, semesterId).stream()
@@ -46,9 +37,11 @@ public class CourseSectionService {
                 .collect(Collectors.toList());
     }
 
-    // All sections available for a grade (including full)
-    public List<CourseSectionDTO> getSectionsForGrade(Long semesterId, Integer gradeLevel) {
-        return sectionRepository.findAvailableForGrade(semesterId, gradeLevel).stream()
+    public List<CourseSectionDTO> getSectionsFiltered(Long semesterId, Long courseId, Integer gradeLevel, boolean openOnly) {
+        var sections = sectionRepository.findFiltered(semesterId, courseId, gradeLevel);
+
+        return sections.stream()
+                .filter(section -> !openOnly || !section.isFull())
                 .map(sectionMapper::toDTO)
                 .collect(Collectors.toList());
     }
