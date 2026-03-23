@@ -6,9 +6,11 @@ import com.maplewood.model.*;
 import com.maplewood.model.Enrollment.Status;
 import com.maplewood.repository.*;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,47 +20,63 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-// TODO: refactor test to use @Mock and @InjectMocks annotations for cleaner setup
+@ExtendWith(MockitoExtension.class)
 class EnrollmentServiceTest {
 
+    @Mock
     private EnrollmentRepository enrollmentRepository;
+    @Mock
     private StudentRepository studentRepository;
+    @Mock
     private CourseSectionRepository courseSectionRepository;
+    @Mock
     private CourseRepository courseRepository;
+    @Mock
     private StudentCourseHistoryRepository historyRepository;
+
+    @InjectMocks
     private EnrollmentService enrollmentService;
 
-    @BeforeEach
-    void setUp() {
-        enrollmentRepository = mock(EnrollmentRepository.class);
-        studentRepository = mock(StudentRepository.class);
-        courseSectionRepository = mock(CourseSectionRepository.class);
-        courseRepository = mock(CourseRepository.class);
-        historyRepository = mock(StudentCourseHistoryRepository.class);
+    private Student createStudent(long id) {
+        Student s = new Student();
+        s.setId(id);
+        return s;
+    }
 
-        enrollmentService = new EnrollmentService(
-                enrollmentRepository,
-                studentRepository,
-                courseSectionRepository,
-                courseRepository,
-                historyRepository
-        );
+    private Course createCourse(long id, Long prerequisiteId) {
+        Course c = new Course();
+        c.setId(id);
+        c.setPrerequisiteId(prerequisiteId);
+        return c;
+    }
+
+    private Semester createSemester(long id) {
+        Semester s = new Semester();
+        s.setId(id);
+        return s;
+    }
+
+    private CourseSection createCourseSection(long id, Course course, Semester semester, int maxCap, int currEnrolled, String day, String start, String end) {
+        CourseSection cs = new CourseSection();
+        cs.setId(id);
+        cs.setCourse(course);
+        cs.setSemester(semester);
+        cs.setMaxCapacity(maxCap);
+        cs.setCurrentEnrollment(currEnrolled);
+        cs.setDayOfWeek(day);
+        cs.setStartTime(start);
+        cs.setEndTime(end);
+        cs.setSectionLetter("A");
+        return cs;
     }
 
     @Test
     void enroll_successful() {
         long studentId = 1L, sectionId = 10L;
-        Student student = new Student(); student.setId(studentId);
-        Semester semester = new Semester(); semester.setId(100L);
-        CourseSection section = new CourseSection(); 
-        section.setId(sectionId);
-        section.setSemester(semester);
-        section.setMaxCapacity(30); 
-        section.setCurrentEnrollment(10);
-        section.setDayOfWeek("MWF");
-        section.setStartTime("09:00");
-        section.setEndTime("10:00");
-        Course course = new Course(); course.setId(50L); section.setCourse(course);
+        Student student = createStudent(studentId);
+        Course course = createCourse(50L, null);
+        Semester sem = createSemester(100L);
+        CourseSection section = createCourseSection(sectionId, course, sem, 30, 10, "MWF", "09:00", "10:00");
 
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
         when(courseSectionRepository.findById(sectionId)).thenReturn(Optional.of(section));
@@ -66,7 +84,6 @@ class EnrollmentServiceTest {
         when(enrollmentRepository.countBySectionIdAndStatus(sectionId, Status.ENROLLED)).thenReturn(10L);
         when(enrollmentRepository.findByStudentIdAndStatus(studentId, Status.ENROLLED)).thenReturn(List.of());
         when(historyRepository.findByStudentIdWithCourse(studentId)).thenReturn(List.of());
-        when(courseRepository.findById(anyLong())).thenReturn(Optional.empty());
         when(enrollmentRepository.insertAndReturnId(any(Enrollment.class))).thenReturn(123L);
         when(courseSectionRepository.save(any(CourseSection.class))).thenReturn(section);
 
@@ -89,7 +106,7 @@ class EnrollmentServiceTest {
 
     @Test
     void enroll_sectionNotFound_throws() {
-        when(studentRepository.findById(anyLong())).thenReturn(Optional.of(new Student()));
+        when(studentRepository.findById(anyLong())).thenReturn(Optional.of(createStudent(1L)));
         when(courseSectionRepository.findById(anyLong())).thenReturn(Optional.empty());
         EnrollmentException ex = assertThrows(
             EnrollmentException.class,
@@ -103,7 +120,7 @@ class EnrollmentServiceTest {
         long studentId = 1L, sectionId = 2L;
         Enrollment enrollment = new Enrollment();
         enrollment.setStatus(Status.ENROLLED);
-        when(studentRepository.findById(studentId)).thenReturn(Optional.of(new Student()));
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(createStudent(studentId)));
         when(courseSectionRepository.findById(sectionId)).thenReturn(Optional.of(new CourseSection()));
         when(enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId)).thenReturn(Optional.of(enrollment));
 
@@ -117,14 +134,16 @@ class EnrollmentServiceTest {
     @Test
     void enroll_maxEnrollmentsReached_throws() {
         long studentId = 1L, sectionId = 2L;
-        when(studentRepository.findById(studentId)).thenReturn(Optional.of(new Student()));
-        CourseSection section = new CourseSection(); section.setId(sectionId); section.setMaxCapacity(30);
+        Student student = createStudent(studentId);
+        Course course = createCourse(60L, null);
+        Semester sem = createSemester(200L);
+        CourseSection section = createCourseSection(sectionId, course, sem, 30, 10, "MWF", "09:00", "10:00");
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
         when(courseSectionRepository.findById(sectionId)).thenReturn(Optional.of(section));
         when(enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId)).thenReturn(Optional.empty());
         when(enrollmentRepository.countBySectionIdAndStatus(anyLong(), any())).thenReturn(1L);
         List<Enrollment> cur = List.of(new Enrollment(), new Enrollment(), new Enrollment(), new Enrollment(), new Enrollment());
         when(enrollmentRepository.findByStudentIdAndStatus(studentId, Status.ENROLLED)).thenReturn(cur);
-        when(historyRepository.findByStudentIdWithCourse(studentId)).thenReturn(List.of());
 
         EnrollmentException ex = assertThrows(
             EnrollmentException.class,
@@ -136,8 +155,10 @@ class EnrollmentServiceTest {
     @Test
     void enroll_sectionFull_throws() {
         long studentId = 1L, sectionId = 2L;
-        CourseSection section = new CourseSection(); section.setId(sectionId); section.setMaxCapacity(2);
-        when(studentRepository.findById(studentId)).thenReturn(Optional.of(new Student()));
+        Course course = createCourse(60L, null);
+        Semester sem = createSemester(101L);
+        CourseSection section = createCourseSection(sectionId, course, sem, 2, 2, "MWF", "09:00", "10:00");
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(createStudent(studentId)));
         when(courseSectionRepository.findById(sectionId)).thenReturn(Optional.of(section));
         when(enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId)).thenReturn(Optional.empty());
         when(enrollmentRepository.countBySectionIdAndStatus(sectionId, Status.ENROLLED)).thenReturn(2L);
@@ -152,15 +173,16 @@ class EnrollmentServiceTest {
     @Test
     void enroll_prerequisitesNotMet_throws() {
         long studentId = 1L, sectionId = 2L;
-        CourseSection section = new CourseSection(); section.setId(sectionId); section.setMaxCapacity(30);
-        Course course = new Course(); course.setId(5L); course.setPrerequisiteId(99L); section.setCourse(course);
+        Course course = createCourse(5L, 99L);
+        Semester sem = createSemester(105L);
+        CourseSection section = createCourseSection(sectionId, course, sem, 30, 0, "MWF", "09:00", "10:00");
 
-        when(studentRepository.findById(studentId)).thenReturn(Optional.of(new Student()));
+        when(studentRepository.findById(studentId)).thenReturn(Optional.of(createStudent(studentId)));
         when(courseSectionRepository.findById(sectionId)).thenReturn(Optional.of(section));
         when(enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId)).thenReturn(Optional.empty());
         when(enrollmentRepository.countBySectionIdAndStatus(sectionId, Status.ENROLLED)).thenReturn(0L);
         when(enrollmentRepository.findByStudentIdAndStatus(studentId, Status.ENROLLED)).thenReturn(List.of());
-        when(historyRepository.findByStudentIdWithCourse(studentId)).thenReturn(List.of()); // has no courses
+        when(historyRepository.findByStudentIdWithCourse(studentId)).thenReturn(List.of()); // no history
         when(courseRepository.findById(99L)).thenReturn(Optional.of(new Course()));
 
         EnrollmentException ex = assertThrows(
@@ -173,17 +195,19 @@ class EnrollmentServiceTest {
     @Test
     void enroll_timeConflict_throws() {
         long studentId = 111, sectionId = 222;
-        Student student = new Student(); student.setId(studentId);
-        Course course = new Course(); course.setId(50L);
-        CourseSection section = new CourseSection(); section.setId(sectionId); section.setDayOfWeek("MWF"); section.setStartTime("09:00"); section.setEndTime("10:00"); section.setMaxCapacity(10); section.setCourse(course);
+        Student student = createStudent(studentId);
+        Course course = createCourse(50L, null);
+        Semester sem = createSemester(202L);
+        CourseSection section = createCourseSection(sectionId, course, sem, 10, 0, "MWF", "09:00", "10:00");
+
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
         when(courseSectionRepository.findById(sectionId)).thenReturn(Optional.of(section));
         when(enrollmentRepository.findByStudentIdAndSectionId(studentId, sectionId)).thenReturn(Optional.empty());
         when(enrollmentRepository.countBySectionIdAndStatus(sectionId, Status.ENROLLED)).thenReturn(0L);
 
-        CourseSection enrolled = new CourseSection(); enrolled.setDayOfWeek("MWF"); enrolled.setStartTime("09:30"); enrolled.setEndTime("10:30");
-        Enrollment enr = new Enrollment(); enr.setSection(enrolled);
-        when(enrollmentRepository.findByStudentIdAndStatus(studentId, Status.ENROLLED)).thenReturn(List.of(enr));
+        CourseSection enrolledSection = createCourseSection(333L, createCourse(51L, null), sem, 10, 0, "MWF", "09:30", "10:30");
+        Enrollment enrollment = new Enrollment(); enrollment.setSection(enrolledSection);
+        when(enrollmentRepository.findByStudentIdAndStatus(studentId, Status.ENROLLED)).thenReturn(List.of(enrollment));
         when(historyRepository.findByStudentIdWithCourse(studentId)).thenReturn(List.of());
 
         EnrollmentException ex = assertThrows(
