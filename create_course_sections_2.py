@@ -232,14 +232,12 @@ def create_course_sections():
 
         print(f"\n{code} - {name} ({ctype}, {section_count} sections)")
 
-        # ---------- Round-robin slot pointer for this course ----------
         slot_pointer = 0
 
         for sec_num in range(section_count):
             letter = chr(65 + sec_num)
             scheduled = False
 
-            # ---------- Round-robin slot try for each section ----------
             for try_idx in range(len(slots)):
                 slot_idx = (slot_pointer + try_idx) % len(slots)
                 day, start, end = slots[slot_idx]
@@ -258,7 +256,6 @@ def create_course_sections():
                         if not can_assign_room(rid, day, start, end):
                             continue
 
-                        # Schedule it!
                         cursor.execute("""
                             INSERT INTO course_sections
                             (course_id, semester_id, teacher_id, classroom_id,
@@ -278,7 +275,6 @@ def create_course_sections():
                     if scheduled:
                         break
                 if scheduled:
-                    # ---------- Advance slot pointer for next section ----------
                     slot_pointer = (slot_idx + 1) % len(slots)
                     break
 
