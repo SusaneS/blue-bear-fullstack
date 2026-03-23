@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCourses } from '../hooks/useCourses';
 import './CourseBrowser.css';
 import { Course } from '../types/types';
+import { useAppSelector } from '../store/hooks';
+
+const GRADE_LEVELS = [
+  9, 10, 11, 12
+];
 
 enum CourseTypeFilter {
   ALL = 'all',
@@ -22,31 +27,37 @@ const getPrerequisiteName = (prerequisiteId: number | undefined, courses: Course
 }
 
 const CourseBrowser: React.FC = () => {
-  //TODO: once student data is in the store, use it to filter out courses that are not relevant to the student based on grade level and completed prerequisites
-    //or can use it for validation once student tries to enroll in a course - check if they meet the grade level and prerequisite requirements and show an error message if not
-    // const { profile } = useAppSelector((state) => state.student);
+  const { profile } = useAppSelector((state) => state.student);
   const { courses, loading, error } = useCourses();
 
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<CourseTypeFilter>(CourseTypeFilter.ALL);
+  const [selectedGradeLevel, setSelectedGradeLevel] = useState<number | undefined>(undefined);
 
-  const filtered = courses.filter((c) => {
-     //TODO: ditto
-    // if (profile) {
-    //   if (course.gradeLevel.min > profile.gradeLevel || course.gradeLevel.max < profile.gradeLevel) {
-    //     return false;
-    //   }
-    // }
+  useEffect(() => {
+    if (profile?.gradeLevel) {
+      setSelectedGradeLevel(profile.gradeLevel);
+    }
+  }, [profile]);
+  
+  const filtered = courses.filter((course) => {
+    if (
+      selectedGradeLevel !== undefined &&
+      (course.gradeLevel.min > selectedGradeLevel ||
+        course.gradeLevel.max < selectedGradeLevel)
+    ) {
+      return false;
+    }
 
-    if (typeFilter !== CourseTypeFilter.ALL && c.courseType !== typeFilter) {
+    if (typeFilter !== CourseTypeFilter.ALL && course.courseType !== typeFilter) {
       return false;
     }
 
     if (search) {
       const term = search.toLowerCase();
       return (
-        c.name.toLowerCase().includes(term) ||
-        c.code.toLowerCase().includes(term)
+        course.name.toLowerCase().includes(term) ||
+        course.code.toLowerCase().includes(term)
       );
     }
 
@@ -66,6 +77,23 @@ const CourseBrowser: React.FC = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        <div className="grade-filter">
+            <label htmlFor="grade-level-dropdown">Grade:&nbsp;</label>
+            <select
+              id="grade-level-dropdown"
+              value={selectedGradeLevel ?? ''}
+              onChange={e =>
+                setSelectedGradeLevel(
+                  e.target.value ? parseInt(e.target.value) : undefined
+                )
+              }
+            >
+              <option value="">All Grades</option>
+              {GRADE_LEVELS.map((gl) => (
+                <option key={gl} value={gl}>{gl}</option>
+              ))}
+            </select>
+          </div>
         <div className="filter-buttons">
           {FILTER_CONFIG.map((f) => (
             <button
