@@ -10,7 +10,9 @@ import './ScheduleBuilder.css';
 import { useAppSelector } from '../store/hooks';
 import { selectEnrolledSectionsState } from '../store/selectors/selectEnrolledSectionsState';
 
-//TODO: fix logic - not correct, need courses list
+// TODO: fix logic - not correct, need courses list to get the name of the prerequisite course
+// add a selector to get sections with their prerequisite course names for easier validation and display in the UI
+// since now it's relaying on API validation and message from there
 const hasMetPrerequisites = (
   section: CourseSection,
   courseHistory: { courseId: number; status: string }[]
@@ -99,7 +101,7 @@ function Modal({
 const ScheduleBuilder: React.FC = () => {
   const dispatch = useDispatch();
 
-  const { profile, loading } = useAppSelector((state) => state.student);
+  const { profile, loading: profileLoading } = useAppSelector((state) => state.student);
   const { sections, loading: sectionsLoading } = useAppSelector((state) => state.courseSections);
   const { enrolledSections, loading: enrollmentLoading, error: enrollmentError } = useAppSelector(selectEnrolledSectionsState);
 
