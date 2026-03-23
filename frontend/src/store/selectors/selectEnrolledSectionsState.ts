@@ -8,12 +8,14 @@ export const selectEnrolledSectionsState = createSelector(
     (state: RootState) => state.enrollment.enrollments,
     (state: RootState) => state.enrollment.loading,
     (state: RootState) => state.enrollment.error,
+    (state: RootState) => state.courseSections.loading,
+    (state: RootState) => state.courseSections.error,
   ],
-  (sections, enrollments, loading, error) => ({
+  (sections, enrollments, enrollmentLoading, enrollmentError, courseSectionsLoading, courseSectionsError) => ({
     enrolledSections: sections.filter((cs: CourseSection) =>
       enrollments.some((e: Enrollment) => e.status === 'enrolled' && e.courseSectionId === cs.id)
     ),
-    loading,
-    error,
+    loading: enrollmentLoading || courseSectionsLoading,
+    error: enrollmentError || courseSectionsError,
   })
 );
