@@ -19,6 +19,10 @@ This project aims to demonstrate fullstack development skills, code organization
   - **Enrollment Repository Customization:**  
   A custom enrollment repository implementation is used to properly retrieve generated keys (e.g., autoincremented IDs) on insert. This serves as a workaround for default repository limitations observed when mapping inserted entities with their generated keys in some JPA/JDBC contexts.
 
+## Python Scripts
+    - **Database Population:**  
+    Python scripts are included to generate realistic data for the provided SQLite database. These scripts create course sections table, populate it with time slots, and generate student enrollments for the current semester while respecting prerequisites and other constraints. Script for generating course sections and time slots is `create_course_sections_2.py`, and the script for generating student enrollments is `create_enrollments.py`. The script for generating course sections and its algorithm can for sure be improved, but it should serve the purpose of creating a realistic dataset for testing the scheduling logic.
+
 ## Notes & Improvements (Due to Time Constraints)
 
 - Some features and API routes may have additional opportunities for refactoring or generalization as the project grows.
