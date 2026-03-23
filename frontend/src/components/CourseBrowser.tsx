@@ -28,7 +28,7 @@ const getPrerequisiteName = (prerequisiteId: number | undefined, courses: Course
 
 const CourseBrowser: React.FC = () => {
   const { profile } = useAppSelector((state) => state.student);
-  const { courses, loading, error } = useCourses();
+  const { courses, loading, error } = useAppSelector((state) => state.course);
 
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<CourseTypeFilter>(CourseTypeFilter.ALL);

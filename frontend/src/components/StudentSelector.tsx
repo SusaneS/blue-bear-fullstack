@@ -4,6 +4,7 @@ import { fetchStudents, fetchStudentProfile, clearProfile } from '../store/stude
 import './StudentSelector.css';
 import { fetchEnrollments } from '../store/enrollmentSlice';
 import { fetchCourseSections } from '../store/courseSectionsSlice';
+import { fetchCourses } from '../store/courseSlice';
 
 // Assumption that schedule builder only shows course sections for current semester
 const CURRENT_SEMESTER_ID = 10;
@@ -21,6 +22,7 @@ const StudentSelector: React.FC = () => {
     const studentId = Number(e.target.value);
     if (studentId) {
       dispatch(fetchStudentProfile(studentId));
+      dispatch(fetchCourses());
       dispatch(fetchCourseSections({ semesterId: CURRENT_SEMESTER_ID, gradeLevel: profile?.gradeLevel, openOnly: false }) as any);
       dispatch(fetchEnrollments(studentId));
     } else {

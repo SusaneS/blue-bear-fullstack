@@ -18,17 +18,25 @@ const initialState: StudentState = {
 
 export const fetchStudents = createAsyncThunk(
   'student/fetchAll',
-  async () => {
-    const response = await studentsApi.getAll();
-    return response.data;
+  async (_, { rejectWithValue }) => {
+    try {
+        const response = await studentsApi.getAll();
+        return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch students');
+    }
   }
 );
 
 export const fetchStudentProfile = createAsyncThunk(
   'student/fetchProfile',
-  async (studentId: number) => {
-    const response = await studentsApi.getProfile(studentId);
-    return response.data;
+  async (studentId: number, { rejectWithValue }) => {
+    try {
+      const response = await studentsApi.getProfile(studentId);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch profile');
+    }
   }
 );
 
@@ -53,7 +61,7 @@ const studentSlice = createSlice({
       })
       .addCase(fetchStudents.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to load students';
+        state.error = action.payload as string || 'Failed to load students';
       })
       .addCase(fetchStudentProfile.pending, (state) => {
         state.loading = true;
@@ -65,7 +73,7 @@ const studentSlice = createSlice({
       })
       .addCase(fetchStudentProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to load profile';
+        state.error = action.payload as string || 'Failed to load profile';
       });
   },
 });

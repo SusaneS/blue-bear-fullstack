@@ -70,7 +70,7 @@ const enrollmentSlice = createSlice({
       })
       .addCase(fetchEnrollments.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || 'Failed to load enrollments';
+        state.error = action.payload as string || 'Failed to load enrollments';
       })
       .addCase(enrollInSection.pending, (state) => {
         state.loading = true;

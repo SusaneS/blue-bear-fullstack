@@ -127,6 +127,7 @@ public class EnrollmentService {
 
     private void validatePrerequisitesMet(Long studentId, CourseSection section) {
         List<StudentCourseHistory> history = historyRepository.findByStudentIdWithCourse(studentId);
+        System.out.println("Checking prerequisites for student " + history.stream().map(h -> h.getCourse().getName() + ":" + h.getStatus()).toList());
         boolean prerequisitesMet = hasMetPrerequisites(section.getCourse(), history);
         if (!prerequisitesMet) {
             String prerequisiteCourseName = courseRepository.findById(section.getCourse().getPrerequisiteId())

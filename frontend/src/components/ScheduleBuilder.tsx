@@ -1,3 +1,7 @@
+// TODO: clean-up, address other TODOs
+// group sections in a nicer way
+// add ability to expand or scroll through course history and see details - currently just a long list
+// add ability to filter by different attributes (instead of only search)
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { enrollInSection, dropEnrollment } from '../store/enrollmentSlice';
