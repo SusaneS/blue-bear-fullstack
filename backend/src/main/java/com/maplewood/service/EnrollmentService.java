@@ -15,7 +15,6 @@ import com.maplewood.repository.StudentRepository;
 import com.maplewood.repository.CourseRepository;
 import com.maplewood.repository.CourseSectionRepository;
 
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -109,12 +108,8 @@ public class EnrollmentService {
         Long generatedId = enrollmentRepository.insertAndReturnId(newEnrollment);
         newEnrollment.setId(generatedId);
         section.setCurrentEnrollment(section.getCurrentEnrollment() + 1);
-    try {
+    
         courseSectionRepository.save(section);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            throw new EnrollmentException(EnrollmentException.ErrorType.SECTION_FULL,
-                "Section just filled up. Please refresh and try another section.");
-        }
         return EnrollmentMapper.toDTO(newEnrollment);
     }
 
