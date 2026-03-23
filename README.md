@@ -25,8 +25,9 @@ This project aims to demonstrate fullstack development skills, code organization
 - Certain sections of the code include TODOs and further documentation for clarity and future work.
 - Additional unit and integration tests could be added to improve coverage, especially for edge cases (due to time constraints, testing is barely covered sadly).
 - Error handling and user feedback mechanisms can always benefit from iterative refinement.
-- Handloading of asynchronous operations in the frontend can be further improved with better loading states and error messages.
+- Handling of asynchronous operations in the frontend can be further improved with better loading states/indicators and error messages.
 - Styles (CSS/HTML) can be extended and made more accessible or responsive depending on project scope and feedback (focus was on functionality and state management here).
+- Some files, especially on the frontend, may remain from initial project scaffolding and were not fully removed during the initial cleanup.
 - The current project structure aims for clarity but may be adapted as new requirements emerge.
 
 ---
